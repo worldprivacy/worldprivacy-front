@@ -26,9 +26,8 @@ const Nav = () => {
             <div className="hidden md:flex gap-6">
                 {links.map((link, index) => (
                     <HoverCard key={index}>
-                        <HoverCardTrigger className="relative">
+                        <HoverCardTrigger className="relative" asChild>
                             <Link
-                                suppressHydrationWarning={true}
                                 href={link.href}
                                 className="hover:text-fuchsia-500"
                             >
