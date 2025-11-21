@@ -46,7 +46,7 @@ const HomePage = () => {
                         priority
                     />
                     {/* Overlay pour que le texte soit + lisible */}
-                    <div className="absolute inset-0 bg-black/10"/>
+                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-white"/>
                 </div>
 
                 {/* Contenu Hero */}
