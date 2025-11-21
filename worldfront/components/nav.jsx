@@ -6,18 +6,22 @@ import Link from 'next/link'
 const Nav = () => {
 
     const links = [
-        { name: "Qui sommes nous ?", href: "/about" },
-        { name: "Contact", href: "/contact" },
+        { name: "Carte", href: "/carte" },
+        { name: "Quizz", href: "/quizz" },
+        { name: "FAQ", href: "/faq" },
     ];
 
     return (
         <nav className="fixed top-0 left-0 w-full flex items-center justify-between p-4 z-50
-                backdrop-blur-md transition-all duration-300 border-b-1">
+                backdrop-blur-md transition-all duration-300 border-b-1 border-black rounded-md">
 
-            <div className="text-3xl font-bold">
+            <div className="text-3xl font-bold flex-row">
                 <Link suppressHydrationWarning={true} href="/">
                     <span className="text-primary hover:opacity-80 transition-all duration-300">
-                        WorldPrivacy.
+                        World
+                    </span>
+                    <span className="text-orange-500 hover:opacity-80 transition-all duration-300">
+                        Privacy.
                     </span>
                 </Link>
             </div>
@@ -29,7 +33,7 @@ const Nav = () => {
                         <HoverCardTrigger className="relative" asChild>
                             <Link
                                 href={link.href}
-                                className="hover:text-fuchsia-500"
+                                className="hover:text-orange-500"
                             >
                                 {link.name}
                             </Link>
