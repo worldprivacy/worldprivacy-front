@@ -10,46 +10,107 @@ import {
 import {Button} from "@/components/ui/button";
 import Link from "next/link";
 import Image from "next/image";
+import { Scale, Gavel, FileText } from "lucide-react";
 
 const HomePage = () => {
+
+    const features = [
+        {
+            icon: Scale,
+            title: "Législations",
+            color: "text-orange-500"
+        },
+        {
+            icon: Gavel,
+            title: "Autorités nationales",
+            color: "text-orange-500"
+        },
+        {
+            icon: FileText,
+            title: "Transferts internationaux",
+            color: "text-orange-500"
+        }
+    ];
+
     return (
-        <section className="relative min-h-screen w-full overflow-hidden">
-            {/* Image de fond - Carte du monde */}
-            <div className="absolute inset-0 z-0">
-                <Image
-                    src="/carte-monde-couleur.jpg"
-                    alt="Carte du monde"
-                    fill
-                    className="object-cover"
-                    priority
-                />
-                {/* Overlay pour améliorer la lisibilité du texte */}
-                <div className="absolute inset-0 bg-black/10"/>
-            </div>
+        <>
+            {/* Section Hero avec image en absolute */}
+            <section className="relative h-screen w-full overflow-hidden">
+                {/* img Carte du monde en absolute */}
+                <div className="absolute inset-0 z-0">
+                    <Image
+                        src="/carte-monde-couleur.jpg"
+                        alt="Carte du monde"
+                        fill
+                        className="object-cover"
+                        priority
+                    />
+                    {/* Overlay pour que le texte soit + lisible */}
+                    <div className="absolute inset-0 bg-black/10"/>
+                </div>
 
-            {/* Contenu */}
-            <div className="relative z-10 container mx-auto px-4 flex flex-col justify-center min-h-screen">
-                <div className="max-w-3xl space-y-8">
-                    {/* Titre principal */}
-                    <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight">
-                        Découvrez comment vos données sont protégées à travers le monde
-                    </h1>
+                {/* Contenu Hero */}
+                <div className="relative z-10 container mx-auto px-4 flex flex-col justify-center h-full">
+                    <div className="max-w-3xl space-y-8">
+                        <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight">
+                            Découvrez comment vos données sont protégées à travers le monde
+                        </h1>
 
-                    {/* Bouton CTA */}
-                    <div>
-                        <Button
-                            asChild
-                            size="lg"
-                            className="bg-purple-900 hover:bg-purple-800 text-white px-12 py-6 text-xl rounded-md shadow-xl transition-all duration-300 hover:scale-105"
-                        >
-                            <Link href="/carte">
-                                Explorez la carte
-                            </Link>
-                        </Button>
+                        {/* Bouton CTA */}
+                        <div>
+                            <Button
+                                asChild
+                                size="lg"
+                                className="bg-purple-900 hover:bg-purple-800 text-white px-12 py-6 text-xl rounded-md shadow-xl transition-all duration-300 hover:scale-105"
+                            >
+                                <Link href="/carte">
+                                    Explorez la carte
+                                </Link>
+                            </Button>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </section>
+            </section>
+
+            {/* Section Features - dans le flux normal en dessous */}
+            <section className="bg-background py-16 md:py-24">
+                <div className="container mx-auto px-4">
+                    {/* Grille des icônes et titres */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-16">
+                        {features.map((feature, index) => (
+                            <div key={index} className="flex flex-col items-center text-center space-y-4">
+                                {/* Icône */}
+                                <div className="w-24 h-24 flex items-center justify-center">
+                                    <feature.icon className="w-20 h-20 text-primary stroke-[1.5]"/>
+                                </div>
+                                {/* Titre */}
+                                <h3 className={`text-xl md:text-2xl font-semibold ${feature.color}`}>
+                                    {feature.title}
+                                </h3>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Textes descriptifs */}
+                    <div className="max-w-4xl mx-auto space-y-6 text-foreground leading-relaxed">
+                        <p>
+                            Nunc placerat non nibh at fringilla at, elit viverra facilisis consectetur nisl.
+                            tincidunt Lorem viverra sed diam elit efficitur. vitae porta Quisque placerat
+                        </p>
+
+                        <p>
+                            at, venenatis sed Cras elit dolor malesuada tincidunt odio quis Nunc Nunc commodo
+                            id In convallis. tincidunt efficitur. scelerisque gravida Donec Nullam ipsum
+                        </p>
+
+                        <p>
+                            cursus placerat Vestibulum lacus, vitae faucibus ex tempor placerat. risus amet,
+                            urna amet, ullamcorper sodales. placerat tempor ex. placerat fringilla orci
+                        </p>
+                    </div>
+                </div>
+            </section>
+        </>
     )
 }
 
