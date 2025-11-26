@@ -1,6 +1,7 @@
 'use client'
 
 import {Section} from '@/components/boxWrap';
+import InteractiveWorldMap from "@/components/worldMap";
 import {
     Accordion,
     AccordionContent,
@@ -117,11 +118,9 @@ const HomePage = () => {
 
 const Carte = () => {
     return (
-        <Section className="relative min-h-screen flex flex-col items-center justify-center px-6">
-            <div className="text-red">
-                <h1>Loading...</h1>
-            </div>
-        </Section>
+        <div className="container mx-auto px-4 py-24">
+            <InteractiveWorldMap/>
+        </div>
     )
 }
 
