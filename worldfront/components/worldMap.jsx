@@ -28,7 +28,7 @@ export default function InteractiveWorldMap() {
     const [compareCountryA, setCompareCountryA] = useState(null);
     const [compareCountryB, setCompareCountryB] = useState(null);
 
-    // Données des pays - À remplacer par votre CSV
+    // Données des pays à remplacer par API
     const countryData = {
         "FRA": {
             nom: "France",
@@ -45,7 +45,6 @@ export default function InteractiveWorldMap() {
             code_iso2: "DE",
             niveau: "Pays membre de l'UE ou de l'EEE",
             niveau_ordre: 1,
-            site: "https://www.bfdi.bund.de",
             membre_edpb: "Oui",
             membre_afapdp: "Non",
             adresse: "Graurheindorfer Straße 153, 53117 Bonn, Deutschland"
@@ -55,7 +54,6 @@ export default function InteractiveWorldMap() {
             code_iso2: "US",
             niveau: "Pays en adéquation partielle",
             niveau_ordre: 3,
-            site: "https://www.dataprivacyframework.gov",
             membre_edpb: "Non",
             membre_afapdp: "Non",
             adresse: "600 Pennsylvania Avenue, NW Washington, DC 20580"

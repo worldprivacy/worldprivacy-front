@@ -12,6 +12,7 @@ import {Button} from "@/components/ui/button";
 import Link from "next/link";
 import Image from "next/image";
 import { Scale, Gavel, FileText } from "lucide-react";
+import Squeeze from "@/components/squeeze";
 
 const HomePage = () => {
 
@@ -127,9 +128,7 @@ const Carte = () => {
 const Quizz = () => {
     return (
         <Section className="relative min-h-screen flex flex-col items-center justify-center px-6">
-            <div className="text-red">
-                <h1>Loading...</h1>
-            </div>
+            <Squeeze/>
         </Section>
     )
 }
