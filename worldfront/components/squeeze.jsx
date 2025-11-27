@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, XCircle, Lock, ShieldCheck, ShieldAlert, RefreshCw } from "lucide-react";
 import Image from "next/image";
 
-export default function Squeeze() {
+export default function Quizz() {
     const [questions, setQuestions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -19,10 +19,20 @@ export default function Squeeze() {
 
     const fetchQuestions = async () => {
         try {
-            const res = await fetch("http://localhost:8080/src/Infrastructure/Api/GetRandomQuestionsController.php");
+            const res = await fetch("/api/questions");
             const data = await res.json();
             console.log("Data:", data);
-            setQuestions(data);
+
+            // Mapper les données de l'API au format attendu
+            const formattedQuestions = data.map(q => ({
+                id: q.id,
+                question_text: q.intitule,
+                correct_answer: q.reponse,
+                texteVrai: q.texteVrai,
+                texteFaux: q.texteFaux
+            }));
+
+            setQuestions(formattedQuestions);
             setLoading(false);
         } catch (error) {
             console.error("Erreur lors du chargement des questions:", error);
@@ -33,6 +43,7 @@ export default function Squeeze() {
     const handleAnswer = (answer) => {
         const currentQ = questions[currentQuestion];
         const isCorrect = answer === currentQ.correct_answer;
+        const explanationText = isCorrect ? currentQ.texteVrai : currentQ.texteFaux;
 
         setUserAnswers([
             ...userAnswers,
@@ -41,6 +52,7 @@ export default function Squeeze() {
                 userAnswer: answer,
                 correctAnswer: currentQ.correct_answer,
                 isCorrect: isCorrect,
+                explanation: explanationText
             },
         ]);
 
@@ -103,6 +115,7 @@ export default function Squeeze() {
         );
     }
 
+    // Écran de démarrage
     if (!quizStarted) {
         return (
             <div className="min-h-screen relative overflow-hidden">
@@ -131,13 +144,14 @@ export default function Squeeze() {
         );
     }
 
-    // résultats
+    // Écran de résultats
     if (quizFinished) {
         const score = calculateScore();
         const protectionMsg = getProtectionMessage();
 
         return (
             <div className="min-h-screen relative overflow-hidden">
+                {/* Image de fond */}
                 <div className="absolute inset-0 z-0">
                     <Image
                         src="/carte-monde-couleur.jpg"
@@ -150,7 +164,7 @@ export default function Squeeze() {
                 </div>
 
                 <div className="relative z-10 container mx-auto px-4 py-12">
-                    {/* Message */}
+                    {/* Message de protection */}
                     <Card className={`max-w-3xl mx-auto mb-8 border-4 ${protectionMsg.color}`}>
                         <CardContent className="p-8 text-center space-y-4">
                             <div className="flex justify-center">{protectionMsg.icon}</div>
@@ -172,7 +186,7 @@ export default function Squeeze() {
                         </div>
                     </div>
 
-                    {/* Récap des questions */}
+                    {/* Récapitulatif des questions */}
                     <div className="max-w-3xl mx-auto space-y-4">
                         <h3 className="text-2xl font-bold mb-6">Récapitulatif de tes réponses</h3>
                         {userAnswers.map((answer, index) => (
@@ -192,7 +206,7 @@ export default function Squeeze() {
                                         <div className="flex-1">
                                             <p className="font-semibold mb-2">Question {index + 1}</p>
                                             <p className="mb-3">{answer.question}</p>
-                                            <div className="flex gap-4 text-sm">
+                                            <div className="flex gap-4 text-sm mb-3">
                                                 <Badge variant={answer.isCorrect ? "default" : "destructive"}>
                                                     Ta réponse : {answer.userAnswer ? "Vrai" : "Faux"}
                                                 </Badge>
@@ -202,6 +216,10 @@ export default function Squeeze() {
                                                     </Badge>
                                                 )}
                                             </div>
+                                            {/* Explication */}
+                                            <div className="mt-3 p-3 bg-white rounded-lg border">
+                                                <p className="text-sm text-gray-700">{answer.explanation}</p>
+                                            </div>
                                         </div>
                                     </div>
                                 </CardContent>
@@ -209,6 +227,7 @@ export default function Squeeze() {
                         ))}
                     </div>
 
+                    {/* Bouton recommencer */}
                     <div className="max-w-3xl mx-auto mt-8 text-center">
                         <Button
                             size="lg"
@@ -224,11 +243,23 @@ export default function Squeeze() {
         );
     }
 
+    // Écran de question
     const currentQ = questions[currentQuestion];
+
+    // Protection si la question n'existe pas
+    if (!currentQ) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <p className="text-xl">Chargement de la question...</p>
+            </div>
+        );
+    }
+
     const progress = ((currentQuestion + 1) / questions.length) * 100;
 
     return (
         <div className="min-h-screen relative overflow-hidden">
+            {/* Image de fond */}
             <div className="absolute inset-0 z-0">
                 <Image
                     src="/carte-monde-couleur.jpg"
@@ -240,6 +271,7 @@ export default function Squeeze() {
                 <div className="absolute inset-0 bg-white/70" />
             </div>
 
+            {/* Contenu */}
             <div className="relative z-10 min-h-screen flex items-center justify-center px-4">
                 <div className="max-w-4xl w-full">
                     {/* Barre de progression */}
@@ -258,12 +290,14 @@ export default function Squeeze() {
                         </div>
                     </div>
 
+                    {/* Question */}
                     <Card className="border-4 border-primary shadow-2xl">
                         <CardContent className="p-12">
                             <h2 className="text-3xl font-bold text-center mb-12">
                                 {currentQ.question_text}
                             </h2>
 
+                            {/* Boutons Vrai/Faux */}
                             <div className="grid grid-cols-2 gap-6">
                                 <Button
                                     size="lg"
