@@ -151,20 +151,7 @@ export default function Quizz() {
 
         return (
             <div className="min-h-screen relative overflow-hidden">
-                {/* Image de fond */}
-                <div className="absolute inset-0 z-0">
-                    <Image
-                        src="/carte-monde-couleur.jpg"
-                        alt="Carte du monde"
-                        fill
-                        className="object-cover"
-                        priority
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/80 to-white" />
-                </div>
-
                 <div className="relative z-10 container mx-auto px-4 py-12">
-                    {/* Message de protection */}
                     <Card className={`max-w-3xl mx-auto mb-8 border-4 ${protectionMsg.color}`}>
                         <CardContent className="p-8 text-center space-y-4">
                             <div className="flex justify-center">{protectionMsg.icon}</div>
@@ -176,7 +163,6 @@ export default function Quizz() {
                         </CardContent>
                     </Card>
 
-                    {/* Barre de progression */}
                     <div className="max-w-3xl mx-auto mb-8">
                         <div className="bg-gray-200 rounded-full h-4 overflow-hidden">
                             <div
@@ -186,7 +172,6 @@ export default function Quizz() {
                         </div>
                     </div>
 
-                    {/* Récapitulatif des questions */}
                     <div className="max-w-3xl mx-auto space-y-4">
                         <h3 className="text-2xl font-bold mb-6">Récapitulatif de tes réponses</h3>
                         {userAnswers.map((answer, index) => (
@@ -216,7 +201,6 @@ export default function Quizz() {
                                                     </Badge>
                                                 )}
                                             </div>
-                                            {/* Explication */}
                                             <div className="mt-3 p-3 bg-white rounded-lg border">
                                                 <p className="text-sm text-gray-700">{answer.explanation}</p>
                                             </div>
@@ -227,7 +211,6 @@ export default function Quizz() {
                         ))}
                     </div>
 
-                    {/* Bouton recommencer */}
                     <div className="max-w-3xl mx-auto mt-8 text-center">
                         <Button
                             size="lg"
