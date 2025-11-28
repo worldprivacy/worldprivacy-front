@@ -242,18 +242,6 @@ export default function Quizz() {
 
     return (
         <div className="min-h-screen relative overflow-hidden">
-            {/* Image de fond */}
-            <div className="absolute inset-0 z-0">
-                <Image
-                    src="/carte-monde-couleur.jpg"
-                    alt="Carte du monde"
-                    fill
-                    className="object-cover"
-                    priority
-                />
-                <div className="absolute inset-0 bg-white/70" />
-            </div>
-
             {/* Contenu */}
             <div className="relative z-10 min-h-screen flex items-center justify-center px-4">
                 <div className="max-w-4xl w-full">
@@ -280,7 +268,6 @@ export default function Quizz() {
                                 {currentQ.question_text}
                             </h2>
 
-                            {/* Boutons Vrai/Faux */}
                             <div className="grid grid-cols-2 gap-6">
                                 <Button
                                     size="lg"
