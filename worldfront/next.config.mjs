@@ -4,7 +4,11 @@ const nextConfig = {
         return [
             {
                 source: '/api/questions',
-                destination: 'http://localhost:8080/src/Infrastructure/Api/GetRandomQuestionsController.php',
+                destination: 'http://localhost:8080/question/list-random',
+            },
+            {
+                source: '/api/countries',
+                destination: 'http://localhost:8080/pays/list',
             },
         ];
     },

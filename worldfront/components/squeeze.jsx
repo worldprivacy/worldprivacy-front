@@ -20,19 +20,25 @@ export default function Quizz() {
     const fetchQuestions = async () => {
         try {
             const res = await fetch("/api/questions");
-            const data = await res.json();
-            console.log("Data:", data);
+            const response = await res.json();
+            console.log("Data:", response);
 
-            // Mapper les données de l'API au format attendu
-            const formattedQuestions = data.map(q => ({
-                id: q.id,
-                question_text: q.intitule,
-                correct_answer: q.reponse,
-                texteVrai: q.texteVrai,
-                texteFaux: q.texteFaux
-            }));
+            // Vérifier si la requête a réussi
+            if (response.success && response.data && response.data.questions) {
+                // Mapper les données de l'API au format attendu
+                const formattedQuestions = response.data.questions.map(q => ({
+                    id: q.id,
+                    question_text: q.intitule,
+                    correct_answer: q.reponse,
+                    texteVrai: q.texteVrai,
+                    texteFaux: q.texteFaux
+                }));
 
-            setQuestions(formattedQuestions);
+                setQuestions(formattedQuestions);
+            } else {
+                console.error("Erreur API:", response.error_message);
+            }
+
             setLoading(false);
         } catch (error) {
             console.error("Erreur lors du chargement des questions:", error);
@@ -152,6 +158,7 @@ export default function Quizz() {
         return (
             <div className="min-h-screen relative overflow-hidden">
                 <div className="relative z-10 container mx-auto px-4 py-12">
+                    {/* Message de protection */}
                     <Card className={`max-w-3xl mx-auto mb-8 border-4 ${protectionMsg.color}`}>
                         <CardContent className="p-8 text-center space-y-4">
                             <div className="flex justify-center">{protectionMsg.icon}</div>
@@ -163,6 +170,7 @@ export default function Quizz() {
                         </CardContent>
                     </Card>
 
+                    {/* Barre de progression */}
                     <div className="max-w-3xl mx-auto mb-8">
                         <div className="bg-gray-200 rounded-full h-4 overflow-hidden">
                             <div
@@ -172,6 +180,7 @@ export default function Quizz() {
                         </div>
                     </div>
 
+                    {/* Récapitulatif des questions */}
                     <div className="max-w-3xl mx-auto space-y-4">
                         <h3 className="text-2xl font-bold mb-6">Récapitulatif de tes réponses</h3>
                         {userAnswers.map((answer, index) => (
@@ -201,6 +210,7 @@ export default function Quizz() {
                                                     </Badge>
                                                 )}
                                             </div>
+                                            {/* Explication */}
                                             <div className="mt-3 p-3 bg-white rounded-lg border">
                                                 <p className="text-sm text-gray-700">{answer.explanation}</p>
                                             </div>
@@ -211,6 +221,7 @@ export default function Quizz() {
                         ))}
                     </div>
 
+                    {/* Bouton recommencer */}
                     <div className="max-w-3xl mx-auto mt-8 text-center">
                         <Button
                             size="lg"
@@ -242,6 +253,18 @@ export default function Quizz() {
 
     return (
         <div className="min-h-screen relative overflow-hidden">
+            {/* Image de fond */}
+            <div className="absolute inset-0 z-0">
+                <Image
+                    src="/carte-monde-couleur.jpg"
+                    alt="Carte du monde"
+                    fill
+                    className="object-cover"
+                    priority
+                />
+                <div className="absolute inset-0 bg-white/70" />
+            </div>
+
             {/* Contenu */}
             <div className="relative z-10 min-h-screen flex items-center justify-center px-4">
                 <div className="max-w-4xl w-full">
@@ -268,6 +291,7 @@ export default function Quizz() {
                                 {currentQ.question_text}
                             </h2>
 
+                            {/* Boutons Vrai/Faux */}
                             <div className="grid grid-cols-2 gap-6">
                                 <Button
                                     size="lg"
