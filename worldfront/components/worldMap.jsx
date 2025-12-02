@@ -20,7 +20,6 @@ import { Plus, Minus, MapPin, ArrowLeft, Scale, Trophy, X } from "lucide-react";
 // URL standard du GeoJSON pour les pays
 const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-50m.json";
 
-// Définition des couleurs et de l'ordre de protection
 const niveauCouleurs = {
     "Pays membre de l'UE ou de l'EEE": "#10b981", // Vert
     "Pays adéquat": "#3b82f6", // Bleu
@@ -39,12 +38,12 @@ const niveauOrdre = {
     "Pas de loi": 6
 };
 
-// Fonction utilitaire pour obtenir la couleur
+// Fonction obtenir couleur
 const getCountryColor = (niveau) => {
     return niveauCouleurs[niveau] || "#e5e7eb"; // Gris clair par défaut (donnée manquante)
 };
 
-// 🔑 CORRECTION CLÉ : Mapping ISO-2 (de l'API) vers ISO-3 Numérique (de geo.id)
+// Mapping ISO-2 (de l'API) vers ISO-3 Numérique (de geo.id)
 const iso2ToNumeric = {
     "AF": "004", "ZA": "710", "AL": "008", "DZ": "012", "DE": "276",
     "AD": "020", "AO": "024", "AG": "028", "SA": "682", "AR": "032",
@@ -92,7 +91,7 @@ const iso2ToNumeric = {
     "ZM": "894", "ZW": "716",
 };
 
-// Mapping des noms anglais (GeoJSON) vers noms français (API) - Sauvegarde en cas d'échec ID
+// Mapping des noms anglais (GeoJSON) vers noms français (API)
 const nameMapping = {
     "France": "France", "Germany": "Allemagne", "United States of America": "Etats-Unis",
     "China": "Chine", "Brazil": "Brésil", "Japan": "Japon", "United Kingdom": "Royaume-Uni",
@@ -112,7 +111,6 @@ const nameMapping = {
     "Latvia": "Lettonie", "Estonia": "Estonie"
 };
 
-// --- Logique du composant principal ---
 
 export default function InteractiveWorldMap() {
     const [selectedCountry, setSelectedCountry] = useState(null);
@@ -178,9 +176,9 @@ export default function InteractiveWorldMap() {
 
         if (data) {
             setSelectedCountry({ ...data, code: geo.id });
-            setSidebarMode(null); // Montre la fiche simple par défaut
+            setSidebarMode(null);
         } else {
-            // Logique de secours par nom (si l'ID n'est pas mappé)
+            // (si l'ID n'est pas mappé)
             const englishName = geo.properties?.name;
             const frenchName = nameMapping[englishName] || englishName;
 
@@ -196,7 +194,7 @@ export default function InteractiveWorldMap() {
                 setSelectedCountry(null); // Cache la sidebar
             }
         }
-        setCompareCountryB(null); // Réinitialise la comparaison
+        setCompareCountryB(null); // Reset la comparaison
     };
 
     const getMostProtective = (countryA, countryB) => {
@@ -210,14 +208,13 @@ export default function InteractiveWorldMap() {
         return <div className="text-center py-12">Chargement de la carte...</div>;
     }
 
-    // --- Vue Carte et Sidebar ---
     return (
         <div className="flex w-full min-h-[500px]">
-            {/* 1. Bloc principal de la Carte */}
+            {/* Bloc principal de la Carte */}
             <div className={`relative space-y-6 transition-all duration-300 ${selectedCountry ? 'w-3/4' : 'w-full'}`}>
                 <div className="relative border-4 border-primary rounded-3xl overflow-hidden bg-gray-50 h-full">
 
-                    {/* Contrôles de Zoom */}
+                    {/* Btn Contrôles de Zoom */}
                     <div className="absolute top-6 left-6 z-10 flex flex-col gap-2">
                         <Button variant="outline" size="icon" onClick={handleZoomIn} className="bg-white shadow-lg">
                             <Plus className="h-4 w-4" />
@@ -227,13 +224,12 @@ export default function InteractiveWorldMap() {
                         </Button>
                     </div>
 
-                    {/* 🚀 Tooltip positionné dynamiquement */}
                     {tooltipContent && (
                         <div
                             className="absolute z-50 bg-white px-3 py-2 rounded-lg shadow-xl border pointer-events-none"
                             style={{
                                 borderLeft: `5px solid ${getCountryColor(tooltipContent.niveau)}`,
-                                // 💡 AJUSTÉ : Positionnement au-dessus et à droite
+                                // 💡 ajustement pos
                                 top: cursorPosition.y - 40,
                                 left: cursorPosition.x + 10,
                             }}
@@ -274,7 +270,7 @@ export default function InteractiveWorldMap() {
                                                 geography={geo}
                                                 fill={fillColor}
 
-                                                // 💡 Ajouté : Gestion du mouvement pour le tooltip
+                                                // 💡 Gérer mouvement tooltip
                                                 onMouseMove={(event) => {
                                                     setCursorPosition({ x: event.clientX, y: event.clientY });
                                                 }}
@@ -292,15 +288,15 @@ export default function InteractiveWorldMap() {
                                                         outline: "none",
                                                         stroke: "#ffffff",
                                                         strokeWidth: 0.5,
-                                                        transition: "all 250ms", // 🚀 Effet smooth
+                                                        transition: "all 250ms",
                                                     },
                                                     hover: {
                                                         fill: baseColor,
                                                         outline: "none",
                                                         cursor: cursorStyle,
                                                         stroke: "#000000",
-                                                        strokeWidth: 1.0, // 🤏 Bordure plus fine
-                                                        transition: "all 250ms", // 🚀 Effet smooth
+                                                        strokeWidth: 1.0,
+                                                        transition: "all 250ms",
                                                     },
                                                     pressed: { outline: "none" },
                                                 }}
@@ -328,7 +324,7 @@ export default function InteractiveWorldMap() {
                 </div>
             </div>
 
-            {/* 2. Sidebar Card (Fiche pays / Comparateur) */}
+            {/* Sidebar Card */}
             {selectedCountry && (
                 <div className={`transition-all duration-300 ${selectedCountry ? 'w-1/4 pl-4' : 'w-0'}`}>
                     <Card className="h-full">
@@ -341,7 +337,7 @@ export default function InteractiveWorldMap() {
                             </Button>
                         </CardHeader>
                         <CardContent className="pt-2">
-                            {/* Vue Fiche Simple */}
+                            {/* Vue Simple */}
                             {sidebarMode !== 'compare' && (
                                 <div className="space-y-4">
                                     <div className="pt-2">
@@ -367,7 +363,7 @@ export default function InteractiveWorldMap() {
                                 </div>
                             )}
 
-                            {/* 🚀 Vue Comparateur Intégré */}
+                            {/* Vue Comparateur */}
                             {sidebarMode === 'compare' && (
                                 <div className="space-y-4 pt-2">
                                     <h4 className="text-sm font-semibold mb-3">Comparer avec :</h4>
@@ -414,7 +410,7 @@ export default function InteractiveWorldMap() {
                                                 </div>
                                             </Card>
 
-                                            {/* Affichage du pays A pour comparaison visuelle */}
+                                            {/* Affichage du pays A */}
                                             <Card className="p-3">
                                                 <div className="flex justify-between items-start">
                                                     <div>
