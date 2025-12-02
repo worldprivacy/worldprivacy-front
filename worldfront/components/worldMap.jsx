@@ -15,17 +15,116 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { Plus, Minus, MapPin, ArrowLeft, Scale, Trophy } from "lucide-react";
+import { Plus, Minus, MapPin, ArrowLeft, Scale, Trophy, X } from "lucide-react";
 
+// URL standard du GeoJSON pour les pays
 const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-50m.json";
+
+// Définition des couleurs et de l'ordre de protection
+const niveauCouleurs = {
+    "Pays membre de l'UE ou de l'EEE": "#10b981", // Vert
+    "Pays adéquat": "#3b82f6", // Bleu
+    "Pays en adéquation partielle": "#8b5cf6", // Violet
+    "Autorité et loi spécifiques": "#f59e0b", // Orange
+    "Loi (non adéquat)": "#ef4444", // Rouge
+    "Pas de loi": "#9ca3af", // Gris foncé
+};
+
+const niveauOrdre = {
+    "Pays membre de l'UE ou de l'EEE": 1,
+    "Pays adéquat": 2,
+    "Pays en adéquation partielle": 3,
+    "Autorité et loi spécifiques": 4,
+    "Loi (non adéquat)": 5,
+    "Pas de loi": 6
+};
+
+// Fonction utilitaire pour obtenir la couleur
+const getCountryColor = (niveau) => {
+    return niveauCouleurs[niveau] || "#e5e7eb"; // Gris clair par défaut (donnée manquante)
+};
+
+// 🔑 CORRECTION CLÉ : Mapping ISO-2 (de l'API) vers ISO-3 Numérique (de geo.id)
+const iso2ToNumeric = {
+    "AF": "004", "ZA": "710", "AL": "008", "DZ": "012", "DE": "276",
+    "AD": "020", "AO": "024", "AG": "028", "SA": "682", "AR": "032",
+    "AM": "051", "AU": "036", "AT": "040", "AZ": "031", "BS": "044",
+    "BH": "048", "BD": "050", "BB": "052", "BE": "056", "BZ": "204",
+    "BM": "060", "BT": "064", "BY": "112", "MM": "104", "BO": "068",
+    "BA": "070", "BW": "072", "BR": "076", "BN": "096", "BG": "100",
+    "BF": "854", "BI": "108", "KH": "116", "CM": "120", "CA": "124",
+    "CV": "132", "CL": "152", "CN": "156", "CY": "196", "CO": "170",
+    "KM": "174", "CG": "178", "KP": "408", "KR": "410", "CR": "188",
+    "CI": "384", "HR": "191", "CU": "192", "DK": "208", "DJ": "262",
+    "DM": "212", "EG": "818", "AE": "784", "EC": "218", "ER": "232",
+    "ES": "724", "EE": "233", "US": "840", "ET": "231", "FJ": "242",
+    "FI": "246", "FR": "250", "GA": "266", "GM": "270", "GE": "268",
+    "GH": "288", "GI": "292", "GR": "300", "GD": "308", "GL": "304",
+    "GP": "312", "GT": "320", "GG": "831", "GN": "324", "GQ": "226",
+    "GW": "624", "GY": "328", "GF": "254", "HT": "332", "HN": "340",
+    "HK": "344", "HU": "348", "IM": "833", "KY": "136", "FO": "234",
+    "IN": "356", "ID": "360", "IR": "364", "IQ": "368", "IE": "372",
+    "IS": "352", "IL": "376", "IT": "380", "JM": "388", "JP": "392",
+    "JE": "832", "JO": "392", "KZ": "398", "KE": "404", "KG": "417",
+    "KI": "296", "XK": "921", "KW": "414", "LA": "418", "LS": "426",
+    "LV": "428", "LB": "422", "LR": "430", "LY": "434", "LI": "438",
+    "LT": "440", "LU": "442", "MO": "446", "MK": "807", "MG": "450",
+    "MY": "458", "MW": "454", "MV": "462", "ML": "466", "MT": "470",
+    "MA": "504", "MH": "584", "MQ": "474", "MU": "480", "MR": "478",
+    "YT": "175", "MX": "484", "FM": "583", "MD": "498", "MC": "492",
+    "MN": "496", "ME": "499", "MZ": "508", "NA": "516", "NR": "520",
+    "NP": "524", "NI": "558", "NE": "562", "NG": "566", "NO": "578",
+    "NC": "540", "NZ": "554", "OM": "512", "UG": "800", "UZ": "860",
+    "PK": "586", "PW": "585", "PS": "275", "PA": "591", "PG": "598",
+    "PY": "600", "NL": "528", "PE": "604", "PH": "608", "PL": "616",
+    "PF": "258", "PR": "630", "PT": "620", "QA": "634", "CD": "180",
+    "CF": "140", "DO": "214", "CZ": "203", "RE": "638", "RO": "642",
+    "GB": "826", "RU": "643", "RW": "646", "EH": "732", "KN": "659",
+    "LC": "662", "SM": "674", "VC": "670", "SB": "090", "SV": "686",
+    "WS": "882", "ST": "678", "SN": "686", "RS": "688", "SC": "690",
+    "SL": "694", "SG": "702", "SK": "703", "SI": "705", "SO": "706",
+    "SW": "752", "SD": "729", "SS": "728", "LK": "144", "SE": "752",
+    "CH": "756", "SR": "740", "SZ": "748", "SY": "760", "TJ": "762",
+    "TW": "158", "TZ": "834", "TD": "148", "TF": "260", "TH": "764",
+    "TL": "626", "TG": "768", "TO": "776", "TT": "780", "TN": "788",
+    "TM": "795", "TR": "792", "TV": "798", "UA": "804", "UY": "858",
+    "VU": "548", "VA": "336", "VE": "862", "VN": "704", "YE": "887",
+    "ZM": "894", "ZW": "716",
+};
+
+// Mapping des noms anglais (GeoJSON) vers noms français (API) - Sauvegarde en cas d'échec ID
+const nameMapping = {
+    "France": "France", "Germany": "Allemagne", "United States of America": "Etats-Unis",
+    "China": "Chine", "Brazil": "Brésil", "Japan": "Japon", "United Kingdom": "Royaume-Uni",
+    "Spain": "Espagne", "Italy": "Italie", "Canada": "Canada", "Argentina": "Argentine",
+    "South Africa": "Afrique du Sud", "India": "Inde", "Russia": "Russie", "Australia": "Australie",
+    "Algeria": "Algérie", "Mauritania": "Mauritanie", "Sudan": "Soudan", "Venezuela": "Venezuela",
+    "Mexico": "Mexique", "Belgium": "Belgique", "Netherlands": "Pays-Bas", "Portugal": "Portugal",
+    "Poland": "Pologne", "Switzerland": "Suisse", "Austria": "Autriche", "Sweden": "Suède",
+    "Norway": "Norvège", "Denmark": "Danemark", "Finland": "Finlande", "Greece": "Grèce",
+    "Turkey": "Turquie", "Egypt": "Egypte", "Morocco": "Maroc", "Tunisia": "Tunisie",
+    "Kenya": "Kenya", "Nigeria": "Nigeria", "South Korea": "Corée du Sud", "Indonesia": "Indonésie",
+    "Thailand": "Thaïlande", "Vietnam": "Viêt Nam", "Philippines": "Philippines", "Malaysia": "Malaisie",
+    "Singapore": "Singapour", "New Zealand": "Nouvelle-Zélande", "Chile": "Chili", "Colombia": "Colombie",
+    "Peru": "Pérou", "Ukraine": "Ukraine", "Romania": "Roumanie", "Czech Republic": "République Tchèque",
+    "Hungary": "Hongrie", "Ireland": "Irlande", "Croatia": "Croatie", "Bulgaria": "Bulgarie",
+    "Serbia": "Serbie", "Slovakia": "Slovaquie", "Slovenia": "Slovénie", "Lithuania": "Lituanie",
+    "Latvia": "Lettonie", "Estonia": "Estonie"
+};
+
+// --- Logique du composant principal ---
 
 export default function InteractiveWorldMap() {
     const [selectedCountry, setSelectedCountry] = useState(null);
     const [tooltipContent, setTooltipContent] = useState(null);
+    const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
+
     const [zoom, setZoom] = useState(1);
     const [center, setCenter] = useState([0, 20]);
-    const [view, setView] = useState("map");
-    const [compareCountryA, setCompareCountryA] = useState(null);
+
+    // NOUVEL ÉTAT : Gère la vue latérale ('compare' ou null pour fiche simple)
+    const [sidebarMode, setSidebarMode] = useState(null);
+
     const [compareCountryB, setCompareCountryB] = useState(null);
     const [countryData, setCountryData] = useState({});
     const [loading, setLoading] = useState(true);
@@ -38,100 +137,31 @@ export default function InteractiveWorldMap() {
         try {
             const res = await fetch("/api/countries");
             const response = await res.json();
-            console.log("API Response:", response);
 
             if (response.success && response.data && response.data.pays) {
                 const formattedData = {};
 
-                const niveauOrdre = {
-                    "Pays membre de l'UE ou de l'EEE": 1,
-                    "Pays adéquat": 2,
-                    "Pays en adéquation partielle": 3,
-                    "Autorité et loi spécifiques": 4,
-                    "Loi (non adéquat)": 5,
-                    "Pas de loi": 6
-                };
-
-                const iso2ToIso3 = {
-                    "AF": "AFG", "ZA": "ZAF", "AL": "ALB", "DZ": "DZA", "DE": "DEU",
-                    "AD": "AND", "AO": "AGO", "AG": "ATG", "SA": "SAU", "AR": "ARG",
-                    "AM": "ARM", "AU": "AUS", "AT": "AUT", "AZ": "AZE", "BS": "BHS",
-                    "BH": "BHR", "BD": "BGD", "BB": "BRB", "BE": "BEL", "BZ": "BLZ",
-                    "BJ": "BEN", "BM": "BMU", "BT": "BTN", "BY": "BLR", "MM": "MMR",
-                    "BO": "BOL", "BA": "BIH", "BW": "BWA", "BR": "BRA", "BN": "BRN",
-                    "BG": "BGR", "BF": "BFA", "BI": "BDI", "KH": "KHM", "CM": "CMR",
-                    "CA": "CAN", "CV": "CPV", "CL": "CHL", "CN": "CHN", "CY": "CYP",
-                    "CO": "COL", "KM": "COM", "CG": "COG", "KP": "PRK", "KR": "KOR",
-                    "CR": "CRI", "CI": "CIV", "HR": "HRV", "CU": "CUB", "DK": "DNK",
-                    "DJ": "DJI", "DM": "DMA", "EG": "EGY", "AE": "ARE", "EC": "ECU",
-                    "ER": "ERI", "ES": "ESP", "EE": "EST", "US": "USA", "ET": "ETH",
-                    "FJ": "FJI", "FI": "FIN", "FR": "FRA", "GA": "GAB", "GM": "GMB",
-                    "GE": "GEO", "GH": "GHA", "GI": "GIB", "GR": "GRC", "GD": "GRD",
-                    "GL": "GRL", "GP": "GLP", "GT": "GTM", "GG": "GGY", "GN": "GIN",
-                    "GQ": "GNQ", "GW": "GNB", "GY": "GUY", "GF": "GUF", "HT": "HTI",
-                    "HN": "HND", "HK": "HKG", "HU": "HUN", "IM": "IMN", "KY": "CYM",
-                    "FO": "FRO", "IN": "IND", "ID": "IDN", "IR": "IRN", "IQ": "IRQ",
-                    "IE": "IRL", "IS": "ISL", "IL": "ISR", "IT": "ITA", "JM": "JAM",
-                    "JP": "JPN", "JE": "JEY", "JO": "JOR", "KZ": "KAZ", "KE": "KEN",
-                    "KG": "KGZ", "KI": "KIR", "XK": "XKX", "KW": "KWT", "LA": "LAO",
-                    "LS": "LSO", "LV": "LVA", "LB": "LBN", "LR": "LBR", "LY": "LBY",
-                    "LI": "LIE", "LT": "LTU", "LU": "LUX", "MO": "MAC", "MK": "MKD",
-                    "MG": "MDG", "MY": "MYS", "MW": "MWI", "MV": "MDV", "ML": "MLI",
-                    "MT": "MLT", "MA": "MAR", "MH": "MHL", "MQ": "MTQ", "MU": "MUS",
-                    "MR": "MRT", "YT": "MYT", "MX": "MEX", "FM": "FSM", "MD": "MDA",
-                    "MC": "MCO", "MN": "MNG", "ME": "MNE", "MZ": "MOZ", "NA": "NAM",
-                    "NR": "NRU", "NP": "NPL", "NI": "NIC", "NE": "NER", "NG": "NGA",
-                    "NO": "NOR", "NC": "NCL", "NZ": "NZL", "OM": "OMN", "UG": "UGA",
-                    "UZ": "UZB", "PK": "PAK", "PW": "PLW", "PS": "PSE", "PA": "PAN",
-                    "PG": "PNG", "PY": "PRY", "NL": "NLD", "PE": "PER", "PH": "PHL",
-                    "PL": "POL", "PF": "PYF", "PR": "PRI", "PT": "PRT", "QA": "QAT",
-                    "CD": "COD", "CF": "CAF", "DO": "DOM", "CZ": "CZE", "RE": "REU",
-                    "RO": "ROU", "GB": "GBR", "RU": "RUS", "RW": "RWA", "EH": "ESH",
-                    "KN": "KNA", "LC": "LCA", "SM": "SMR", "VC": "VCT", "SB": "SLB",
-                    "SV": "SLV", "WS": "WSM", "ST": "STP", "SN": "SEN", "RS": "SRB",
-                    "SC": "SYC", "SL": "SLE", "SG": "SGP", "SK": "SVK", "SI": "SVN",
-                    "SO": "SOM", "SW": "SWE", "SD": "SDN", "SS": "SSD", "LK": "LKA",
-                    "SE": "SWE", "CH": "CHE", "SR": "SUR", "SZ": "SWZ", "SY": "SYR",
-                    "TJ": "TJK", "TW": "TWN", "TZ": "TZA", "TD": "TCD", "TF": "ATF",
-                    "TH": "THA", "TL": "TLS", "TG": "TGO", "TO": "TON", "TT": "TTO",
-                    "TN": "TUN", "TM": "TKM", "TR": "TUR", "TV": "TUV", "UA": "UKR",
-                    "UY": "URY", "VU": "VUT", "VA": "VAT", "VE": "VEN", "VN": "VNM",
-                    "YE": "YEM", "ZM": "ZMB", "ZW": "ZWE"
-                };
-
                 response.data.pays.forEach(pays => {
-                    const iso3 = iso2ToIso3[pays.code_pays_iso];
-                    if (iso3) {
-                        formattedData[iso3] = {
+                    // Utilisation du mapping vers l'ISO-3 Numérique
+                    const numericCode = iso2ToNumeric[pays.code_pays_iso];
+                    if (numericCode) {
+                        const niveauTrimmed = pays.nv_protection.trim();
+                        formattedData[numericCode] = {
                             nom: pays.nom_pays,
                             code_iso2: pays.code_pays_iso,
-                            niveau: pays.nv_protection.trim(),
-                            niveau_ordre: niveauOrdre[pays.nv_protection.trim()] || 6,
+                            niveau: niveauTrimmed,
+                            niveau_ordre: niveauOrdre[niveauTrimmed] || 6,
                             zone: pays.zone
                         };
                     }
                 });
 
-                console.log(`${Object.keys(formattedData).length} pays chargés`);
                 setCountryData(formattedData);
             }
-
             setLoading(false);
         } catch (error) {
             console.error("Erreur chargement:", error);
             setLoading(false);
-        }
-    };
-
-    const getCountryColor = (niveau) => {
-        switch (niveau) {
-            case "Pays membre de l'UE ou de l'EEE": return "#10b981";
-            case "Pays adéquat": return "#3b82f6";
-            case "Pays en adéquation partielle": return "#8b5cf6";
-            case "Autorité et loi spécifiques": return "#f59e0b";
-            case "Loi (non adéquat)": return "#ef4444";
-            case "Pas de loi": return "#9ca3af";
-            default: return "#e5e7eb";
         }
     };
 
@@ -144,112 +174,35 @@ export default function InteractiveWorldMap() {
     };
 
     const handleCountryClick = (geo) => {
-        const englishName = geo.properties?.name;
+        const data = countryData[geo.id];
 
-        // Mapping des noms anglais (GeoJSON) vers noms français (API)
-        const nameMapping = {
-            "France": "France",
-            "Germany": "Allemagne",
-            "United States of America": "Etats-Unis",
-            "China": "Chine",
-            "Brazil": "Brésil",
-            "Japan": "Japon",
-            "United Kingdom": "Royaume-Uni",
-            "Spain": "Espagne",
-            "Italy": "Italie",
-            "Canada": "Canada",
-            "Argentina": "Argentine",
-            "South Africa": "Afrique du Sud",
-            "India": "Inde",
-            "Russia": "Russie",
-            "Australia": "Australie",
-            "Algeria": "Algérie",
-            "Mauritania": "Mauritanie",
-            "Sudan": "Soudan",
-            "Venezuela": "Venezuela",
-            "Mexico": "Mexique",
-            "Belgium": "Belgique",
-            "Netherlands": "Pays-Bas",
-            "Portugal": "Portugal",
-            "Poland": "Pologne",
-            "Switzerland": "Suisse",
-            "Austria": "Autriche",
-            "Sweden": "Suède",
-            "Norway": "Norvège",
-            "Denmark": "Danemark",
-            "Finland": "Finlande",
-            "Greece": "Grèce",
-            "Turkey": "Turquie",
-            "Egypt": "Egypte",
-            "Morocco": "Maroc",
-            "Tunisia": "Tunisie",
-            "Kenya": "Kenya",
-            "Nigeria": "Nigeria",
-            "South Korea": "Corée du Sud",
-            "Indonesia": "Indonésie",
-            "Thailand": "Thaïlande",
-            "Vietnam": "Viêt Nam",
-            "Philippines": "Philippines",
-            "Malaysia": "Malaisie",
-            "Singapore": "Singapour",
-            "New Zealand": "Nouvelle-Zélande",
-            "Chile": "Chili",
-            "Colombia": "Colombie",
-            "Peru": "Pérou",
-            "Ukraine": "Ukraine",
-            "Romania": "Roumanie",
-            "Czech Republic": "République Tchèque",
-            "Hungary": "Hongrie",
-            "Ireland": "Irlande",
-            "Croatia": "Croatie",
-            "Bulgaria": "Bulgarie",
-            "Serbia": "Serbie",
-            "Slovakia": "Slovaquie",
-            "Slovenia": "Slovénie",
-            "Lithuania": "Lituanie",
-            "Latvia": "Lettonie",
-            "Estonia": "Estonie"
-        };
+        if (data) {
+            setSelectedCountry({ ...data, code: geo.id });
+            setSidebarMode(null); // Montre la fiche simple par défaut
+        } else {
+            // Logique de secours par nom (si l'ID n'est pas mappé)
+            const englishName = geo.properties?.name;
+            const frenchName = nameMapping[englishName] || englishName;
 
-        const frenchName = nameMapping[englishName] || englishName;
+            const foundCountry = Object.entries(countryData).find(([code, countryData]) =>
+                countryData.nom.trim().toLowerCase() === frenchName.trim().toLowerCase()
+            );
 
-        const foundCountry = Object.entries(countryData).find(([code, data]) =>
-            data.nom.trim().toLowerCase() === frenchName.trim().toLowerCase()
-        );
-
-        console.log("Clic:", englishName, "→", frenchName, foundCountry ? "✓" : "✗");
-
-        if (!foundCountry) {
-            // Debug : afficher les noms similaires
-            const similar = Object.entries(countryData)
-                .filter(([code, data]) => data.nom.toLowerCase().includes(frenchName.toLowerCase().substring(0, 4)))
-                .map(([code, data]) => data.nom);
-            console.log("Noms similaires dans l'API:", similar);
+            if (foundCountry) {
+                const [code, data] = foundCountry;
+                setSelectedCountry({ ...data, code });
+                setSidebarMode(null);
+            } else {
+                setSelectedCountry(null); // Cache la sidebar
+            }
         }
-
-        if (foundCountry) {
-            const [code, data] = foundCountry;
-            setSelectedCountry({ ...data, code });
-            setView("country");
-        }
+        setCompareCountryB(null); // Réinitialise la comparaison
     };
 
-    const handleBackToMap = () => {
-        setView("map");
-        setSelectedCountry(null);
-    };
-
-    const handleCompare = () => {
-        if (selectedCountry) {
-            setCompareCountryA(selectedCountry);
-            setView("compare");
-        }
-    };
-
-    const getMostProtective = () => {
-        if (!compareCountryA || !compareCountryB) return null;
-        if (compareCountryA.niveau_ordre < compareCountryB.niveau_ordre) return "A";
-        if (compareCountryB.niveau_ordre < compareCountryA.niveau_ordre) return "B";
+    const getMostProtective = (countryA, countryB) => {
+        if (!countryA || !countryB) return null;
+        if (countryA.niveau_ordre < countryB.niveau_ordre) return "A";
+        if (countryB.niveau_ordre < countryA.niveau_ordre) return "B";
         return "equal";
     };
 
@@ -257,11 +210,14 @@ export default function InteractiveWorldMap() {
         return <div className="text-center py-12">Chargement de la carte...</div>;
     }
 
-    // Vue Carte
-    if (view === "map") {
-        return (
-            <div className="w-full space-y-6">
-                <div className="relative border-4 border-primary rounded-3xl overflow-hidden bg-gray-50">
+    // --- Vue Carte et Sidebar ---
+    return (
+        <div className="flex w-full min-h-[500px]">
+            {/* 1. Bloc principal de la Carte */}
+            <div className={`relative space-y-6 transition-all duration-300 ${selectedCountry ? 'w-3/4' : 'w-full'}`}>
+                <div className="relative border-4 border-primary rounded-3xl overflow-hidden bg-gray-50 h-full">
+
+                    {/* Contrôles de Zoom */}
                     <div className="absolute top-6 left-6 z-10 flex flex-col gap-2">
                         <Button variant="outline" size="icon" onClick={handleZoomIn} className="bg-white shadow-lg">
                             <Plus className="h-4 w-4" />
@@ -271,9 +227,18 @@ export default function InteractiveWorldMap() {
                         </Button>
                     </div>
 
+                    {/* 🚀 Tooltip positionné dynamiquement */}
                     {tooltipContent && (
-                        <div className="absolute top-6 right-6 z-10 bg-white px-4 py-3 rounded-lg shadow-lg border">
-                            <p className="font-bold text-sm">{tooltipContent.nom}</p>
+                        <div
+                            className="absolute z-50 bg-white px-3 py-2 rounded-lg shadow-xl border pointer-events-none"
+                            style={{
+                                borderLeft: `5px solid ${getCountryColor(tooltipContent.niveau)}`,
+                                // 💡 AJUSTÉ : Positionnement au-dessus et à droite
+                                top: cursorPosition.y - 40,
+                                left: cursorPosition.x + 10,
+                            }}
+                        >
+                            <p className="font-bold text-sm text-gray-800">{tooltipContent.nom}</p>
                             <p className="text-xs text-muted-foreground">{tooltipContent.niveau}</p>
                         </div>
                     )}
@@ -283,7 +248,7 @@ export default function InteractiveWorldMap() {
                         projectionConfig={{ scale: 147 }}
                         width={800}
                         height={400}
-                        style={{ width: "100%", height: "auto" }}
+                        style={{ width: "100%", height: "100%" }}
                     >
                         <ZoomableGroup
                             zoom={zoom}
@@ -296,27 +261,24 @@ export default function InteractiveWorldMap() {
                             <Geographies geography={geoUrl}>
                                 {({ geographies }) =>
                                     geographies.map((geo) => {
-                                        const data = countryData[geo.id];
-                                        const fillColor = data ? getCountryColor(data.niveau) : "#e5e7eb";
+                                        const iso3 = geo.id;
+                                        const data = countryData[iso3];
+
+                                        const baseColor = data ? getCountryColor(data.niveau) : "#e5e7eb";
+                                        const fillColor = baseColor;
+                                        const cursorStyle = data ? "pointer" : "default";
 
                                         return (
                                             <Geography
                                                 key={geo.rsmKey}
                                                 geography={geo}
                                                 fill={fillColor}
-                                                stroke="#ffffff"
-                                                strokeWidth={0.5}
-                                                style={{
-                                                    default: { outline: "none" },
-                                                    hover: {
-                                                        fill: data ? fillColor : "#d1d5db",
-                                                        outline: "none",
-                                                        cursor: data ? "pointer" : "default",
-                                                        stroke: "#f59e0b",
-                                                        strokeWidth: 1,
-                                                    },
-                                                    pressed: { outline: "none" },
+
+                                                // 💡 Ajouté : Gestion du mouvement pour le tooltip
+                                                onMouseMove={(event) => {
+                                                    setCursorPosition({ x: event.clientX, y: event.clientY });
                                                 }}
+
                                                 onMouseEnter={() => {
                                                     if (data) {
                                                         setTooltipContent({ nom: data.nom, niveau: data.niveau });
@@ -324,6 +286,24 @@ export default function InteractiveWorldMap() {
                                                 }}
                                                 onMouseLeave={() => setTooltipContent(null)}
                                                 onClick={() => handleCountryClick(geo)}
+
+                                                style={{
+                                                    default: {
+                                                        outline: "none",
+                                                        stroke: "#ffffff",
+                                                        strokeWidth: 0.5,
+                                                        transition: "all 250ms", // 🚀 Effet smooth
+                                                    },
+                                                    hover: {
+                                                        fill: baseColor,
+                                                        outline: "none",
+                                                        cursor: cursorStyle,
+                                                        stroke: "#000000",
+                                                        strokeWidth: 1.0, // 🤏 Bordure plus fine
+                                                        transition: "all 250ms", // 🚀 Effet smooth
+                                                    },
+                                                    pressed: { outline: "none" },
+                                                }}
                                             />
                                         );
                                     })
@@ -333,183 +313,140 @@ export default function InteractiveWorldMap() {
                     </ComposableMap>
                 </div>
 
-                <div className="flex flex-wrap gap-4 justify-center bg-white p-6 rounded-2xl shadow-sm border">
-                    <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 bg-green-500 rounded" />
-                        <span className="text-sm font-medium">UE/EEE</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 bg-blue-500 rounded" />
-                        <span className="text-sm font-medium">Pays adéquat</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 bg-purple-500 rounded" />
-                        <span className="text-sm font-medium">Adéquation partielle</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 bg-orange-500 rounded" />
-                        <span className="text-sm font-medium">Autorité et loi</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 bg-red-500 rounded" />
-                        <span className="text-sm font-medium">Loi non adéquate</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 bg-gray-400 rounded" />
-                        <span className="text-sm font-medium">Pas de loi</span>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-
-    // Vue Fiche Pays
-    if (view === "country" && selectedCountry) {
-        return (
-            <div className="w-full max-w-3xl mx-auto">
-                <Button variant="ghost" onClick={handleBackToMap} className="mb-6">
-                    <ArrowLeft className="h-4 w-4 mr-2" />
-                    Retour à la carte
-                </Button>
-
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="text-3xl">{selectedCountry.nom}</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-6">
-                        <div>
-                            <h4 className="font-semibold mb-3 text-sm text-muted-foreground">
-                                Niveau de protection
-                            </h4>
-                            <Badge
-                                variant="outline"
-                                className="text-base px-4 py-2"
-                                style={{
-                                    borderColor: getCountryColor(selectedCountry.niveau),
-                                    backgroundColor: `${getCountryColor(selectedCountry.niveau)}15`,
-                                    color: getCountryColor(selectedCountry.niveau),
-                                }}
-                            >
-                                {selectedCountry.niveau}
-                            </Badge>
+                {/* Légende de la carte */}
+                <div className="flex flex-wrap gap-4 justify-center bg-white p-4 rounded-2xl shadow-sm border">
+                    {Object.entries(niveauCouleurs).map(([niveau, color]) => (
+                        <div key={niveau} className="flex items-center gap-2">
+                            <div className="w-4 h-4 rounded" style={{ backgroundColor: color }} />
+                            <span className="text-xs font-medium">{niveau}</span>
                         </div>
-
-                        <div className="flex gap-3 pt-4">
-                            <Button onClick={handleCompare} className="flex-1">
-                                <Scale className="h-4 w-4 mr-2" />
-                                Comparer
-                            </Button>
-                            <Button variant="outline" onClick={handleBackToMap} className="flex-1">
-                                <ArrowLeft className="h-4 w-4 mr-2" />
-                                Retour
-                            </Button>
-                        </div>
-                    </CardContent>
-                </Card>
-            </div>
-        );
-    }
-
-    // Vue Comparateur
-    if (view === "compare") {
-        const mostProtective = getMostProtective();
-        const countriesList = Object.entries(countryData).map(([code, data]) => ({
-            code,
-            ...data
-        }));
-
-        return (
-            <div className="w-full max-w-6xl mx-auto">
-                <Button variant="ghost" onClick={handleBackToMap} className="mb-6">
-                    <ArrowLeft className="h-4 w-4 mr-2" />
-                    Retour à la carte
-                </Button>
-
-                <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-                    <Scale className="h-6 w-6" />
-                    Comparateur de pays
-                </h2>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                    <Select
-                        value={compareCountryA?.code}
-                        onValueChange={(code) => setCompareCountryA(countriesList.find(c => c.code === code))}
-                    >
-                        <SelectTrigger>
-                            <SelectValue placeholder="Pays A" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {countriesList.map((country) => (
-                                <SelectItem key={country.code} value={country.code}>
-                                    {country.nom}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-
-                    <Select
-                        value={compareCountryB?.code}
-                        onValueChange={(code) => setCompareCountryB(countriesList.find(c => c.code === code))}
-                    >
-                        <SelectTrigger>
-                            <SelectValue placeholder="Pays B" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {countriesList.map((country) => (
-                                <SelectItem key={country.code} value={country.code}>
-                                    {country.nom}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </div>
-
-                {mostProtective && mostProtective !== "equal" && (
-                    <div className="bg-green-50 border-2 border-green-500 rounded-lg p-4 mb-6 flex items-center gap-3">
-                        <Trophy className="h-6 w-6 text-green-600" />
-                        <p className="font-semibold text-green-900">
-                            {mostProtective === "A" ? compareCountryA.nom : compareCountryB.nom} offre le niveau de protection le plus élevé
-                        </p>
-                    </div>
-                )}
-
-                {mostProtective === "equal" && (
-                    <div className="bg-blue-50 border-2 border-blue-500 rounded-lg p-4 mb-6">
-                        <p className="font-semibold text-blue-900">
-                            Les deux pays ont le même niveau de protection
-                        </p>
-                    </div>
-                )}
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {[compareCountryA, compareCountryB].map((country, idx) => (
-                        country && (
-                            <Card key={idx} className={mostProtective === (idx === 0 ? "A" : "B") ? "border-2 border-green-500" : ""}>
-                                <CardHeader>
-                                    <CardTitle className="flex items-center gap-2">
-                                        {mostProtective === (idx === 0 ? "A" : "B") && (
-                                            <Trophy className="h-5 w-5 text-green-600" />
-                                        )}
-                                        {country.nom}
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <Badge
-                                        variant="outline"
-                                        style={{
-                                            borderColor: getCountryColor(country.niveau),
-                                            backgroundColor: `${getCountryColor(country.niveau)}15`,
-                                            color: getCountryColor(country.niveau),
-                                        }}
-                                    >
-                                        {country.niveau}
-                                    </Badge>
-                                </CardContent>
-                            </Card>
-                        )
                     ))}
+                    <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 bg-gray-200 rounded border border-gray-400" />
+                        <span className="text-xs font-medium">Donnée manquante</span>
+                    </div>
                 </div>
             </div>
-        );
-    }
+
+            {/* 2. Sidebar Card (Fiche pays / Comparateur) */}
+            {selectedCountry && (
+                <div className={`transition-all duration-300 ${selectedCountry ? 'w-1/4 pl-4' : 'w-0'}`}>
+                    <Card className="h-full">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-xl">
+                                {selectedCountry.nom}
+                            </CardTitle>
+                            <Button variant="ghost" size="icon" onClick={() => setSelectedCountry(null)}>
+                                <X className="h-4 w-4" />
+                            </Button>
+                        </CardHeader>
+                        <CardContent className="pt-2">
+                            {/* Vue Fiche Simple */}
+                            {sidebarMode !== 'compare' && (
+                                <div className="space-y-4">
+                                    <div className="pt-2">
+                                        <h4 className="font-semibold mb-1 text-xs text-muted-foreground">
+                                            Niveau de protection
+                                        </h4>
+                                        <Badge
+                                            variant="outline"
+                                            className="text-sm px-3 py-1"
+                                            style={{
+                                                borderColor: getCountryColor(selectedCountry.niveau),
+                                                backgroundColor: `${getCountryColor(selectedCountry.niveau)}15`,
+                                                color: getCountryColor(selectedCountry.niveau),
+                                            }}
+                                        >
+                                            {selectedCountry.niveau}
+                                        </Badge>
+                                    </div>
+                                    <Button onClick={() => setSidebarMode('compare')} className="w-full mt-4">
+                                        <Scale className="h-4 w-4 mr-2" />
+                                        Comparer avec...
+                                    </Button>
+                                </div>
+                            )}
+
+                            {/* 🚀 Vue Comparateur Intégré */}
+                            {sidebarMode === 'compare' && (
+                                <div className="space-y-4 pt-2">
+                                    <h4 className="text-sm font-semibold mb-3">Comparer avec :</h4>
+
+                                    <Select
+                                        value={compareCountryB?.code}
+                                        onValueChange={(code) => setCompareCountryB(countryData[code])}
+                                    >
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Sélectionner le 2ème pays" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {Object.entries(countryData)
+                                                .filter(([code]) => code !== selectedCountry.code) // Exclure le pays déjà sélectionné
+                                                .map(([code, data]) => (
+                                                    <SelectItem key={code} value={code}>
+                                                        {data.nom}
+                                                    </SelectItem>
+                                                ))}
+                                        </SelectContent>
+                                    </Select>
+
+                                    {compareCountryB && (
+                                        <div className="space-y-3 pt-3 border-t">
+                                            <h5 className="text-sm font-semibold">Résultat de la comparaison</h5>
+
+                                            <Card className="p-3">
+                                                <div className="flex justify-between items-start">
+                                                    <div>
+                                                        <p className="font-bold text-base">{compareCountryB.nom}</p>
+                                                        <Badge
+                                                            style={{
+                                                                borderColor: getCountryColor(compareCountryB.niveau),
+                                                                backgroundColor: `${getCountryColor(compareCountryB.niveau)}15`,
+                                                                color: getCountryColor(compareCountryB.niveau),
+                                                            }}
+                                                        >
+                                                            {compareCountryB.niveau}
+                                                        </Badge>
+                                                    </div>
+                                                    {getMostProtective(selectedCountry, compareCountryB) === "B" && (
+                                                        <Trophy className="h-5 w-5 text-green-500" title={`Le ${compareCountryB.nom} a une meilleure protection`} />
+                                                    )}
+                                                </div>
+                                            </Card>
+
+                                            {/* Affichage du pays A pour comparaison visuelle */}
+                                            <Card className="p-3">
+                                                <div className="flex justify-between items-start">
+                                                    <div>
+                                                        <p className="font-bold text-base">{selectedCountry.nom}</p>
+                                                        <Badge
+                                                            style={{
+                                                                borderColor: getCountryColor(selectedCountry.niveau),
+                                                                backgroundColor: `${getCountryColor(selectedCountry.niveau)}15`,
+                                                                color: getCountryColor(selectedCountry.niveau),
+                                                            }}
+                                                        >
+                                                            {selectedCountry.niveau}
+                                                        </Badge>
+                                                    </div>
+                                                    {getMostProtective(selectedCountry, compareCountryB) === "A" && (
+                                                        <Trophy className="h-5 w-5 text-green-500" title={`Le ${selectedCountry.nom} a une meilleure protection`} />
+                                                    )}
+                                                </div>
+                                            </Card>
+
+                                            <Button variant="outline" onClick={() => setSidebarMode(null)} className="w-full mt-2">
+                                                <ArrowLeft className="h-4 w-4 mr-2" />
+                                                Retour à la fiche pays
+                                            </Button>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
+                </div>
+            )}
+        </div>
+    );
 }

@@ -13,6 +13,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Scale, Gavel, FileText } from "lucide-react";
 import Squeeze from "@/components/squeeze";
+import CountryCompare from "@/components/countryCompare";
 
 const HomePage = () => {
 
@@ -110,6 +111,9 @@ const HomePage = () => {
                             urna amet, ullamcorper sodales. placerat tempor ex. placerat fringilla orci
                         </p>
                     </div>
+                </div>
+                <div className="mt-10">
+                    <CountryCompare/>
                 </div>
             </section>
         </>
