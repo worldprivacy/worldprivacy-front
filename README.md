@@ -198,7 +198,7 @@ NEXT_PUBLIC_API_URL=https://votre-api.com
 
 ### Compatibilité React 19
 
-Certaines dépendances ne supportent pas encore officiellement React 19. L'installation avec `--legacy-peer-deps` est nécessaire.
+Certaines dépendances ne supportent pas encore officiellement React 19. L'installation avec `--legacy-peer-deps` est nécessaire ou alors passez sur la version 18.2 de React qui est la plus stable, ce qui à été fait dans ce projet.
 
 ### CORS
 
