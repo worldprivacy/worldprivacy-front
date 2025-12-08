@@ -15,18 +15,26 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { Plus, Minus, MapPin, ArrowLeft, Scale, Trophy, X } from "lucide-react";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+} from "@/components/ui/dialog";
+import { Plus, Minus, ArrowLeft, Scale, Trophy, X, ChevronDown } from "lucide-react";
 
-// URL standard du GeoJSON pour les pays
+// URL pour les données de la carte GeoJSON
 const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-50m.json";
 
+// --- Mappings et Constantes (Vos données) ---
 const niveauCouleurs = {
-    "Pays membre de l'UE ou de l'EEE": "#10b981", // Vert
-    "Pays adéquat": "#3b82f6", // Bleu
-    "Pays en adéquation partielle": "#8b5cf6", // Violet
-    "Autorité et loi spécifiques": "#f59e0b", // Orange
-    "Loi (non adéquat)": "#ef4444", // Rouge
-    "Pas de loi": "#9ca3af", // Gris foncé
+    "Pays membre de l'UE ou de l'EEE": "#10b981",
+    "Pays adéquat": "#3b82f6",
+    "Pays en adéquation partielle": "#8b5cf6",
+    "Autorité et loi spécifiques": "#f59e0b",
+    "Loi (non adéquat)": "#ef4444",
+    "Pas de loi": "#9ca3af",
 };
 
 const niveauOrdre = {
@@ -38,12 +46,11 @@ const niveauOrdre = {
     "Pas de loi": 6
 };
 
-// Fonction obtenir couleur
 const getCountryColor = (niveau) => {
-    return niveauCouleurs[niveau] || "#e5e7eb"; // Gris clair par défaut (donnée manquante)
+    return niveauCouleurs[niveau] || "#e5e7eb";
 };
 
-// Mapping ISO-2 (de l'API) vers ISO-3 Numérique (de geo.id)
+// Mappings ISO-2 vers ISO-3 Numérique (doit être complet pour tous les pays de l'API)
 const iso2ToNumeric = {
     "AF": "004", "ZA": "710", "AL": "008", "DZ": "012", "DE": "276",
     "AD": "020", "AO": "024", "AG": "028", "SA": "682", "AR": "032",
@@ -64,7 +71,7 @@ const iso2ToNumeric = {
     "HK": "344", "HU": "348", "IM": "833", "KY": "136", "FO": "234",
     "IN": "356", "ID": "360", "IR": "364", "IQ": "368", "IE": "372",
     "IS": "352", "IL": "376", "IT": "380", "JM": "388", "JP": "392",
-    "JE": "832", "JO": "392", "KZ": "398", "KE": "404", "KG": "417",
+    "JE": "832", "JO": "400", "KZ": "398", "KE": "404", "KG": "417",
     "KI": "296", "XK": "921", "KW": "414", "LA": "418", "LS": "426",
     "LV": "428", "LB": "422", "LR": "430", "LY": "434", "LI": "438",
     "LT": "440", "LU": "442", "MO": "446", "MK": "807", "MG": "450",
@@ -90,47 +97,25 @@ const iso2ToNumeric = {
     "VU": "548", "VA": "336", "VE": "862", "VN": "704", "YE": "887",
     "ZM": "894", "ZW": "716",
 };
-
-// Mapping des noms anglais (GeoJSON) vers noms français (API)
-const nameMapping = {
-    "France": "France", "Germany": "Allemagne", "United States of America": "Etats-Unis",
-    "China": "Chine", "Brazil": "Brésil", "Japan": "Japon", "United Kingdom": "Royaume-Uni",
-    "Spain": "Espagne", "Italy": "Italie", "Canada": "Canada", "Argentina": "Argentine",
-    "South Africa": "Afrique du Sud", "India": "Inde", "Russia": "Russie", "Australia": "Australie",
-    "Algeria": "Algérie", "Mauritania": "Mauritanie", "Sudan": "Soudan", "Venezuela": "Venezuela",
-    "Mexico": "Mexique", "Belgium": "Belgique", "Netherlands": "Pays-Bas", "Portugal": "Portugal",
-    "Poland": "Pologne", "Switzerland": "Suisse", "Austria": "Autriche", "Sweden": "Suède",
-    "Norway": "Norvège", "Denmark": "Danemark", "Finland": "Finlande", "Greece": "Grèce",
-    "Turkey": "Turquie", "Egypt": "Egypte", "Morocco": "Maroc", "Tunisia": "Tunisie",
-    "Kenya": "Kenya", "Nigeria": "Nigeria", "South Korea": "Corée du Sud", "Indonesia": "Indonésie",
-    "Thailand": "Thaïlande", "Vietnam": "Viêt Nam", "Philippines": "Philippines", "Malaysia": "Malaisie",
-    "Singapore": "Singapour", "New Zealand": "Nouvelle-Zélande", "Chile": "Chili", "Colombia": "Colombie",
-    "Peru": "Pérou", "Ukraine": "Ukraine", "Romania": "Roumanie", "Czech Republic": "République Tchèque",
-    "Hungary": "Hongrie", "Ireland": "Irlande", "Croatia": "Croatie", "Bulgaria": "Bulgarie",
-    "Serbia": "Serbie", "Slovakia": "Slovaquie", "Slovenia": "Slovénie", "Lithuania": "Lituanie",
-    "Latvia": "Lettonie", "Estonia": "Estonie"
-};
+// --- Fin des Mappings ---
 
 
 export default function InteractiveWorldMap() {
     const [selectedCountry, setSelectedCountry] = useState(null);
     const [tooltipContent, setTooltipContent] = useState(null);
     const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
-
     const [zoom, setZoom] = useState(1);
     const [center, setCenter] = useState([0, 20]);
-
-    // NOUVEL ÉTAT : Gère la vue latérale ('compare' ou null pour fiche simple)
     const [sidebarMode, setSidebarMode] = useState(null);
-
     const [compareCountryB, setCompareCountryB] = useState(null);
     const [countryData, setCountryData] = useState({});
     const [loading, setLoading] = useState(true);
+    const [showLegend, setShowLegend] = useState(false);
 
-    useEffect(() => {
-        fetchCountryData();
-    }, []);
+    // État pour gérer l'affichage conditionnel (Desktop vs Mobile Dialog)
+    const [isLargeScreen, setIsLargeScreen] = useState(false);
 
+    // Fonction de récupération des données pays
     const fetchCountryData = async () => {
         try {
             const res = await fetch("/api/countries");
@@ -140,7 +125,6 @@ export default function InteractiveWorldMap() {
                 const formattedData = {};
 
                 response.data.pays.forEach(pays => {
-                    // Utilisation du mapping vers l'ISO-3 Numérique
                     const numericCode = iso2ToNumeric[pays.code_pays_iso];
                     if (numericCode) {
                         const niveauTrimmed = pays.nv_protection.trim();
@@ -158,10 +142,24 @@ export default function InteractiveWorldMap() {
             }
             setLoading(false);
         } catch (error) {
-            console.error("Erreur chargement:", error);
+            console.error("Erreur chargement des données:", error);
             setLoading(false);
         }
     };
+
+    // useEffect pour le chargement des données et la détection de taille d'écran
+    useEffect(() => {
+        fetchCountryData();
+
+        // Détection de la taille d'écran (basée sur 'lg' de Tailwind: 1024px)
+        const checkScreenSize = () => {
+            setIsLargeScreen(window.innerWidth >= 1024);
+        };
+
+        checkScreenSize();
+        window.addEventListener('resize', checkScreenSize);
+        return () => window.removeEventListener('resize', checkScreenSize);
+    }, []);
 
     const handleZoomIn = () => {
         if (zoom < 4) setZoom(zoom * 1.5);
@@ -177,24 +175,8 @@ export default function InteractiveWorldMap() {
         if (data) {
             setSelectedCountry({ ...data, code: geo.id });
             setSidebarMode(null);
-        } else {
-            // (si l'ID n'est pas mappé)
-            const englishName = geo.properties?.name;
-            const frenchName = nameMapping[englishName] || englishName;
-
-            const foundCountry = Object.entries(countryData).find(([code, countryData]) =>
-                countryData.nom.trim().toLowerCase() === frenchName.trim().toLowerCase()
-            );
-
-            if (foundCountry) {
-                const [code, data] = foundCountry;
-                setSelectedCountry({ ...data, code });
-                setSidebarMode(null);
-            } else {
-                setSelectedCountry(null); // Cache la sidebar
-            }
+            setCompareCountryB(null);
         }
-        setCompareCountryB(null); // Reset la comparaison
     };
 
     const getMostProtective = (countryA, countryB) => {
@@ -208,28 +190,29 @@ export default function InteractiveWorldMap() {
         return <div className="text-center py-12">Chargement de la carte...</div>;
     }
 
+    // --- Rendu du Composant ---
     return (
-        <div className="flex w-full min-h-[500px]">
-            {/* Bloc principal de la Carte */}
-            <div className={`relative space-y-6 transition-all duration-300 ${selectedCountry ? 'w-3/4' : 'w-full'}`}>
-                <div className="relative border-4 border-primary rounded-3xl overflow-hidden bg-gray-50 h-full">
+        <div className="flex flex-col lg:flex-row w-full min-h-[400px] md:min-h-[500px] gap-4">
+            {/* Carte */}
+            <div className={`relative space-y-4 transition-all duration-300 ${selectedCountry ? 'lg:w-3/4' : 'w-full'}`}>
+                <div className="relative border-2 md:border-4 border-primary rounded-2xl md:rounded-3xl overflow-hidden bg-gray-50 h-[400px] md:h-[600px]">
 
-                    {/* Btn Contrôles de Zoom */}
-                    <div className="absolute top-6 left-6 z-10 flex flex-col gap-2">
-                        <Button variant="outline" size="icon" onClick={handleZoomIn} className="bg-white shadow-lg">
-                            <Plus className="h-4 w-4" />
+                    {/* Contrôles Zoom */}
+                    <div className="absolute top-3 left-3 md:top-6 md:left-6 z-10 flex flex-col gap-2">
+                        <Button variant="outline" size="icon" onClick={handleZoomIn} className="bg-white shadow-lg h-8 w-8 md:h-10 md:w-10">
+                            <Plus className="h-3 w-3 md:h-4 md:w-4" />
                         </Button>
-                        <Button variant="outline" size="icon" onClick={handleZoomOut} className="bg-white shadow-lg">
-                            <Minus className="h-4 w-4" />
+                        <Button variant="outline" size="icon" onClick={handleZoomOut} className="bg-white shadow-lg h-8 w-8 md:h-10 md:w-10">
+                            <Minus className="h-3 w-3 md:h-4 md:w-4" />
                         </Button>
                     </div>
 
+                    {/* Tooltip Desktop uniquement */}
                     {tooltipContent && (
                         <div
-                            className="absolute z-50 bg-white px-3 py-2 rounded-lg shadow-xl border pointer-events-none"
+                            className="hidden md:block absolute z-50 bg-white px-3 py-2 rounded-lg shadow-xl border pointer-events-none"
                             style={{
                                 borderLeft: `5px solid ${getCountryColor(tooltipContent.niveau)}`,
-                                // 💡 ajustement pos
                                 top: cursorPosition.y - 40,
                                 left: cursorPosition.x + 10,
                             }}
@@ -257,24 +240,18 @@ export default function InteractiveWorldMap() {
                             <Geographies geography={geoUrl}>
                                 {({ geographies }) =>
                                     geographies.map((geo) => {
-                                        const iso3 = geo.id;
-                                        const data = countryData[iso3];
-
+                                        const data = countryData[geo.id];
                                         const baseColor = data ? getCountryColor(data.niveau) : "#e5e7eb";
                                         const fillColor = baseColor;
-                                        const cursorStyle = data ? "pointer" : "default";
 
                                         return (
                                             <Geography
                                                 key={geo.rsmKey}
                                                 geography={geo}
                                                 fill={fillColor}
-
-                                                // 💡 Gérer mouvement tooltip
                                                 onMouseMove={(event) => {
                                                     setCursorPosition({ x: event.clientX, y: event.clientY });
                                                 }}
-
                                                 onMouseEnter={() => {
                                                     if (data) {
                                                         setTooltipContent({ nom: data.nom, niveau: data.niveau });
@@ -282,7 +259,6 @@ export default function InteractiveWorldMap() {
                                                 }}
                                                 onMouseLeave={() => setTooltipContent(null)}
                                                 onClick={() => handleCountryClick(geo)}
-
                                                 style={{
                                                     default: {
                                                         outline: "none",
@@ -293,7 +269,7 @@ export default function InteractiveWorldMap() {
                                                     hover: {
                                                         fill: baseColor,
                                                         outline: "none",
-                                                        cursor: cursorStyle,
+                                                        cursor: data ? "pointer" : "default",
                                                         stroke: "#000000",
                                                         strokeWidth: 1.0,
                                                         transition: "all 250ms",
@@ -309,139 +285,252 @@ export default function InteractiveWorldMap() {
                     </ComposableMap>
                 </div>
 
-                {/* Légende de la carte */}
-                <div className="flex flex-wrap gap-4 justify-center bg-white p-4 rounded-2xl shadow-sm border">
-                    {Object.entries(niveauCouleurs).map(([niveau, color]) => (
-                        <div key={niveau} className="flex items-center gap-2">
-                            <div className="w-4 h-4 rounded" style={{ backgroundColor: color }} />
-                            <span className="text-xs font-medium">{niveau}</span>
-                        </div>
-                    ))}
-                    <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 bg-gray-200 rounded border border-gray-400" />
-                        <span className="text-xs font-medium">Donnée manquante</span>
+                {/* Légende - Collapsible sur mobile */}
+                <div className="bg-white rounded-2xl shadow-sm border overflow-hidden">
+                    <button
+                        onClick={() => setShowLegend(!showLegend)}
+                        className="w-full flex items-center justify-between p-3 md:hidden"
+                    >
+                        <span className="text-sm font-semibold">Légende</span>
+                        <ChevronDown className={`h-4 w-4 transition-transform ${showLegend ? 'rotate-180' : ''}`} />
+                    </button>
+                    <div className={`${showLegend ? 'block' : 'hidden'} md:flex flex-wrap gap-3 md:gap-4 justify-center p-3 md:p-4`}>
+                        {Object.entries(niveauCouleurs).map(([niveau, color]) => (
+                            <div key={niveau} className="flex items-center gap-2">
+                                <div className="w-3 h-3 md:w-4 md:h-4 rounded" style={{ backgroundColor: color }} />
+                                <span className="text-xs font-medium">{niveau}</span>
+                            </div>
+                        ))}
                     </div>
                 </div>
             </div>
 
-            {/* Sidebar Card */}
+            {/* Sidebar Desktop / Dialog Mobile */}
             {selectedCountry && (
-                <div className={`transition-all duration-300 ${selectedCountry ? 'w-1/4 pl-4' : 'w-0'}`}>
-                    <Card className="h-full">
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-xl">
-                                {selectedCountry.nom}
-                            </CardTitle>
-                            <Button variant="ghost" size="icon" onClick={() => setSelectedCountry(null)}>
-                                <X className="h-4 w-4" />
-                            </Button>
-                        </CardHeader>
-                        <CardContent className="pt-2">
-                            {/* Vue Simple */}
-                            {sidebarMode !== 'compare' && (
-                                <div className="space-y-4">
-                                    <div className="pt-2">
-                                        <h4 className="font-semibold mb-1 text-xs text-muted-foreground">
-                                            Niveau de protection
-                                        </h4>
-                                        <Badge
-                                            variant="outline"
-                                            className="text-sm px-3 py-1"
-                                            style={{
-                                                borderColor: getCountryColor(selectedCountry.niveau),
-                                                backgroundColor: `${getCountryColor(selectedCountry.niveau)}15`,
-                                                color: getCountryColor(selectedCountry.niveau),
-                                            }}
-                                        >
-                                            {selectedCountry.niveau}
-                                        </Badge>
+                <>
+                    {/* Desktop Sidebar (visible uniquement sur lg:block) */}
+                    <div className="hidden lg:block lg:w-1/4">
+                        <Card className="h-full">
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-xl">{selectedCountry.nom}</CardTitle>
+                                <Button variant="ghost" size="icon" onClick={() => setSelectedCountry(null)}>
+                                    <X className="h-4 w-4" />
+                                </Button>
+                            </CardHeader>
+                            <CardContent className="pt-2">
+                                {sidebarMode !== 'compare' && (
+                                    <div className="space-y-4">
+                                        <div className="pt-2">
+                                            <h4 className="font-semibold mb-1 text-xs text-muted-foreground">
+                                                Niveau de protection
+                                            </h4>
+                                            <Badge
+                                                variant="outline"
+                                                className="text-sm px-3 py-1"
+                                                style={{
+                                                    borderColor: getCountryColor(selectedCountry.niveau),
+                                                    backgroundColor: `${getCountryColor(selectedCountry.niveau)}15`,
+                                                    color: getCountryColor(selectedCountry.niveau),
+                                                }}
+                                            >
+                                                {selectedCountry.niveau}
+                                            </Badge>
+                                        </div>
+                                        <Button onClick={() => setSidebarMode('compare')} className="w-full mt-4">
+                                            <Scale className="h-4 w-4 mr-2" />
+                                            Comparer avec...
+                                        </Button>
                                     </div>
-                                    <Button onClick={() => setSidebarMode('compare')} className="w-full mt-4">
-                                        <Scale className="h-4 w-4 mr-2" />
-                                        Comparer avec...
-                                    </Button>
-                                </div>
-                            )}
+                                )}
+                                {/* Mode Comparaison PC */}
+                                {sidebarMode === 'compare' && (
+                                    <div className="space-y-4 pt-2">
+                                        <h4 className="text-sm font-semibold mb-3">Comparer avec :</h4>
+                                        <Select
+                                            value={compareCountryB?.code}
+                                            onValueChange={(code) => setCompareCountryB(countryData[code])}
+                                        >
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Sélectionner un pays" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {Object.entries(countryData)
+                                                    .filter(([code]) => code !== selectedCountry.code)
+                                                    .map(([code, data]) => (
+                                                        <SelectItem key={code} value={code}>
+                                                            {data.nom}
+                                                        </SelectItem>
+                                                    ))}
+                                            </SelectContent>
+                                        </Select>
 
-                            {/* Vue Comparateur */}
-                            {sidebarMode === 'compare' && (
-                                <div className="space-y-4 pt-2">
-                                    <h4 className="text-sm font-semibold mb-3">Comparer avec :</h4>
-
-                                    <Select
-                                        value={compareCountryB?.code}
-                                        onValueChange={(code) => setCompareCountryB(countryData[code])}
-                                    >
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Sélectionner le 2ème pays" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {Object.entries(countryData)
-                                                .filter(([code]) => code !== selectedCountry.code) // Exclure le pays déjà sélectionné
-                                                .map(([code, data]) => (
-                                                    <SelectItem key={code} value={code}>
-                                                        {data.nom}
-                                                    </SelectItem>
-                                                ))}
-                                        </SelectContent>
-                                    </Select>
-
-                                    {compareCountryB && (
-                                        <div className="space-y-3 pt-3 border-t">
-                                            <h5 className="text-sm font-semibold">Résultat de la comparaison</h5>
-
-                                            <Card className="p-3">
-                                                <div className="flex justify-between items-start">
-                                                    <div>
-                                                        <p className="font-bold text-base">{compareCountryB.nom}</p>
-                                                        <Badge
-                                                            style={{
-                                                                borderColor: getCountryColor(compareCountryB.niveau),
-                                                                backgroundColor: `${getCountryColor(compareCountryB.niveau)}15`,
-                                                                color: getCountryColor(compareCountryB.niveau),
-                                                            }}
-                                                        >
-                                                            {compareCountryB.niveau}
-                                                        </Badge>
+                                        {compareCountryB && (
+                                            <div className="space-y-3 pt-3 border-t">
+                                                <h5 className="text-sm font-semibold">Comparaison</h5>
+                                                <Card className="p-3">
+                                                    <div className="flex justify-between items-start">
+                                                        <div>
+                                                            <p className="font-bold text-sm">{compareCountryB.nom}</p>
+                                                            <Badge
+                                                                className="mt-1"
+                                                                style={{
+                                                                    borderColor: getCountryColor(compareCountryB.niveau),
+                                                                    backgroundColor: `${getCountryColor(compareCountryB.niveau)}15`,
+                                                                    color: getCountryColor(compareCountryB.niveau),
+                                                                }}
+                                                            >
+                                                                {compareCountryB.niveau}
+                                                            </Badge>
+                                                        </div>
+                                                        {getMostProtective(selectedCountry, compareCountryB) === "B" && (
+                                                            <Trophy className="h-5 w-5 text-green-500" />
+                                                        )}
                                                     </div>
-                                                    {getMostProtective(selectedCountry, compareCountryB) === "B" && (
-                                                        <Trophy className="h-5 w-5 text-green-500" title={`Le ${compareCountryB.nom} a une meilleure protection`} />
-                                                    )}
-                                                </div>
-                                            </Card>
+                                                </Card>
 
-                                            {/* Affichage du pays A */}
-                                            <Card className="p-3">
-                                                <div className="flex justify-between items-start">
-                                                    <div>
-                                                        <p className="font-bold text-base">{selectedCountry.nom}</p>
-                                                        <Badge
-                                                            style={{
-                                                                borderColor: getCountryColor(selectedCountry.niveau),
-                                                                backgroundColor: `${getCountryColor(selectedCountry.niveau)}15`,
-                                                                color: getCountryColor(selectedCountry.niveau),
-                                                            }}
-                                                        >
-                                                            {selectedCountry.niveau}
-                                                        </Badge>
+                                                <Card className="p-3">
+                                                    <div className="flex justify-between items-start">
+                                                        <div>
+                                                            <p className="font-bold text-sm">{selectedCountry.nom}</p>
+                                                            <Badge
+                                                                className="mt-1"
+                                                                style={{
+                                                                    borderColor: getCountryColor(selectedCountry.niveau),
+                                                                    backgroundColor: `${getCountryColor(selectedCountry.niveau)}15`,
+                                                                    color: getCountryColor(selectedCountry.niveau),
+                                                                }}
+                                                            >
+                                                                {selectedCountry.niveau}
+                                                            </Badge>
+                                                        </div>
+                                                        {getMostProtective(selectedCountry, compareCountryB) === "A" && (
+                                                            <Trophy className="h-5 w-5 text-green-500" />
+                                                        )}
                                                     </div>
-                                                    {getMostProtective(selectedCountry, compareCountryB) === "A" && (
-                                                        <Trophy className="h-5 w-5 text-green-500" title={`Le ${selectedCountry.nom} a une meilleure protection`} />
-                                                    )}
-                                                </div>
-                                            </Card>
+                                                </Card>
 
-                                            <Button variant="outline" onClick={() => setSidebarMode(null)} className="w-full mt-2">
-                                                <ArrowLeft className="h-4 w-4 mr-2" />
-                                                Retour à la fiche pays
+                                                <Button variant="outline" onClick={() => setSidebarMode(null)} className="w-full mt-2">
+                                                    <ArrowLeft className="h-4 w-4 mr-2" />
+                                                    Retour
+                                                </Button>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                            </CardContent>
+                        </Card>
+                    </div>
+
+                    {/* Mobile Dialog (Rendu uniquement si ce N'EST PAS un grand écran pour éviter le conflit ARIA) */}
+                    {!isLargeScreen && (
+                        <Dialog open={!!selectedCountry} onOpenChange={() => setSelectedCountry(null)}>
+                            <DialogContent className="lg:hidden max-w-[90vw]">
+                                <DialogHeader>
+                                    <DialogTitle>{selectedCountry.nom}</DialogTitle>
+                                    <DialogDescription className="sr-only">
+                                        Informations détaillées et comparaison pour {selectedCountry.nom}.
+                                    </DialogDescription>
+                                </DialogHeader>
+                                <div className="space-y-4">
+                                    {sidebarMode !== 'compare' && (
+                                        <>
+                                            <div>
+                                                <h4 className="font-semibold mb-2 text-xs text-muted-foreground">
+                                                    Niveau de protection
+                                                </h4>
+                                                <Badge
+                                                    variant="outline"
+                                                    style={{
+                                                        borderColor: getCountryColor(selectedCountry.niveau),
+                                                        backgroundColor: `${getCountryColor(selectedCountry.niveau)}15`,
+                                                        color: getCountryColor(selectedCountry.niveau),
+                                                    }}
+                                                >
+                                                    {selectedCountry.niveau}
+                                                </Badge>
+                                            </div>
+                                            <Button onClick={() => setSidebarMode('compare')} className="w-full">
+                                                <Scale className="h-4 w-4 mr-2" />
+                                                Comparer
                                             </Button>
+                                        </>
+                                    )}
+
+                                    {sidebarMode === 'compare' && (
+                                        <div className="space-y-4">
+                                            <Select
+                                                value={compareCountryB?.code}
+                                                onValueChange={(code) => setCompareCountryB(countryData[code])}
+                                            >
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Sélectionner un pays" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {Object.entries(countryData)
+                                                        .filter(([code]) => code !== selectedCountry.code)
+                                                        .map(([code, data]) => (
+                                                            <SelectItem key={code} value={code}>
+                                                                {data.nom}
+                                                            </SelectItem>
+                                                        ))}
+                                                </SelectContent>
+                                            </Select>
+
+                                            {compareCountryB && (
+                                                <div className="space-y-3">
+                                                    <Card className="p-3">
+                                                        <div className="flex justify-between">
+                                                            <div>
+                                                                <p className="font-bold text-sm">{compareCountryB.nom}</p>
+                                                                <Badge className="mt-1 text-xs"
+                                                                       style={{
+                                                                           borderColor: getCountryColor(compareCountryB.niveau),
+                                                                           backgroundColor: `${getCountryColor(compareCountryB.niveau)}15`,
+                                                                           color: getCountryColor(compareCountryB.niveau),
+                                                                       }}
+                                                                >
+                                                                    {compareCountryB.niveau}
+                                                                </Badge>
+                                                            </div>
+                                                            {getMostProtective(selectedCountry, compareCountryB) === "B" && (
+                                                                <Trophy className="h-5 w-5 text-green-500" />
+                                                            )}
+                                                        </div>
+                                                    </Card>
+
+                                                    <Card className="p-3">
+                                                        <div className="flex justify-between">
+                                                            <div>
+                                                                <p className="font-bold text-sm">{selectedCountry.nom}</p>
+                                                                <Badge className="mt-1 text-xs"
+                                                                       style={{
+                                                                           borderColor: getCountryColor(selectedCountry.niveau),
+                                                                           backgroundColor: `${getCountryColor(selectedCountry.niveau)}15`,
+                                                                           color: getCountryColor(selectedCountry.niveau),
+                                                                       }}
+                                                                >
+                                                                    {selectedCountry.niveau}
+                                                                </Badge>
+                                                            </div>
+                                                            {getMostProtective(selectedCountry, compareCountryB) === "A" && (
+                                                                <Trophy className="h-5 w-5 text-green-500" />
+                                                            )}
+                                                        </div>
+                                                    </Card>
+
+                                                    <Button variant="outline" onClick={() => setSidebarMode(null)} className="w-full">
+                                                        <ArrowLeft className="h-4 w-4 mr-2" />
+                                                        Retour
+                                                    </Button>
+                                                </div>
+                                            )}
                                         </div>
                                     )}
                                 </div>
-                            )}
-                        </CardContent>
-                    </Card>
-                </div>
+                            </DialogContent>
+                        </Dialog>
+                    )}
+                </>
             )}
         </div>
     );
