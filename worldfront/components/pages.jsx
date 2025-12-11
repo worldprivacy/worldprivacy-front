@@ -140,56 +140,56 @@ const Quizz = () => {
 const FAQ = () => {
     const timelineItems = [
         {
-            title: "Lorem Ipsum",
-            content: "sodales. dui massa convallis, facilisis laoreet elit, at Praesent lorem. ex et vel nisl. Nunc faucibus nec efficitur. dolor est. venenatis nulla, eget libero.",
+            title: "Sécuriser ses mots de passe",
+            content: "Des mots de passe forts sont la première barrière contre les intrusions et les piratages.",
             paragraphs: [
-                "nulla, elit. Nunc Sed viverra Donec vitae est. quam eget ullamcorper adipiscing fringilla ultrices ex Lorem turpis massa consectetur Lorem hendrerit venenatis.",
-                "non ipsum amet., vitae dignissim, facilisis ultrices viverra faucibus eget"
+                "Un bon mot de passe doit être long (au moins 12 à 14 caractères) et mélanger lettres, chiffres et symboles. Il vaut mieux éviter les informations faciles à deviner comme une date de naissance, le nom d’un proche ou un mot utilisé partout.",
+                "Il est recommandé d’utiliser un gestionnaire de mots de passe pour créer et enregistrer automatiquement des mots de passe uniques pour chaque service. Cela réduit les risques en cas de fuite d’un site ou d’une application."
             ],
             side: "left"
         },
         {
-            title: "Lorem Ipsum",
-            content: "sodales. dui massa convallis, facilisis laoreet elit, at Praesent lorem. ex et vel nisl. Nunc faucibus nec efficitur. dolor est. venenatis nulla, eget libero.",
+            title: "Activer l’authentification à deux facteurs (2FA)",
+            content: "La 2FA ajoute une couche de sécurité qui rend le piratage beaucoup plus difficile.",
             paragraphs: [
-                "nulla, elit. Nunc Sed viverra Donec vitae est. quam eget ullamcorper adipiscing fringilla ultrices ex Lorem turpis massa consectetur Lorem hendrerit venenatis.",
-                "non ipsum amet., vitae dignissim, facilisis ultrices viverra faucibus eget"
+                "Même avec un bon mot de passe, un compte peut être vulnérable. La 2FA exige une vérification supplémentaire : un code par SMS, une notification dans une application ou une clé physique de sécurité.",
+                "Ainsi, même si quelqu’un obtient votre mot de passe, il ne pourra pas accéder à votre compte sans cette deuxième preuve. Beaucoup de services (Google, Facebook, banques, etc.) recommandent ou imposent déjà ce mécanisme."
             ],
             side: "right"
         },
         {
-            title: "Lorem Ipsum",
-            content: "sodales. dui massa convallis, facilisis laoreet elit, at Praesent lorem. ex et vel nisl. Nunc faucibus nec efficitur. dolor est. venenatis nulla, eget libero.",
+            title: "Mettre à jour ses appareils et ses applications",
+            content: "Les mises à jour corrigent des failles de sécurité que les pirates exploitent activement.",
             paragraphs: [
-                "nulla, elit. Nunc Sed viverra Donec vitae est. quam eget ullamcorper adipiscing fringilla ultrices ex Lorem turpis massa consectetur Lorem hendrerit venenatis.",
-                "non ipsum amet., vitae dignissim, facilisis ultrices viverra faucibus eget"
+                "Chaque mise à jour inclut des correctifs qui protègent contre de nouvelles attaques. Reporter les mises à jour ouvre la porte à des vulnérabilités connues.",
+                "Il est conseillé d’activer les mises à jour automatiques sur les téléphones, les ordinateurs, les navigateurs et les applications. Garder ses appareils à jour permet de réduire considérablement le risque d’intrusion ou de vol de données."
             ],
             side: "left"
         },
         {
-            title: "Lorem Ipsum",
-            content: "sodales. dui massa convallis, facilisis laoreet elit, at Praesent lorem. ex et vel nisl. Nunc faucibus nec efficitur. dolor est. venenatis nulla, eget libero.",
+            title: "Vérifier les permissions de ses applications",
+            content: "Certaines applications collectent plus de données que nécessaire pour fonctionner.",
             paragraphs: [
-                "nulla, elit. Nunc Sed viverra Donec vitae est. quam eget ullamcorper adipiscing fringilla ultrices ex Lorem turpis massa consectetur Lorem hendrerit venenatis.",
-                "non ipsum amet., vitae dignissim, facilisis ultrices viverra faucibus eget"
+                "Avant d’installer une application, il est important de vérifier les accès qu’elle demande : localisation, contacts, micro, caméra… Une application de lampe torche n’a pas besoin d’accéder à vos photos, par exemple.",
+                "Il est conseillé de réviser régulièrement les permissions dans les réglages du téléphone et de désactiver celles qui ne sont pas essentielles. Limiter ces accès permet de réduire la collecte inutile de données personnelles."
             ],
             side: "right"
         },
         {
-            title: "Lorem Ipsum",
-            content: "sodales. dui massa convallis, facilisis laoreet elit, at Praesent lorem. ex et vel nisl. Nunc faucibus nec efficitur. dolor est. venenatis nulla, eget libero.",
+            title: "Se protéger contre les liens et messages suspects",
+            content: "Les cyberattaques commencent souvent par un simple message frauduleux.",
             paragraphs: [
-                "nulla, elit. Nunc Sed viverra Donec vitae est. quam eget ullamcorper adipiscing fringilla ultrices ex Lorem turpis massa consectetur Lorem hendrerit venenatis.",
-                "non ipsum amet., vitae dignissim, facilisis ultrices viverra faucibus eget"
+                "Les tentatives de phishing imitent des entreprises ou des organismes officiels pour vous pousser à cliquer sur un lien ou à partager un code. Il faut toujours vérifier l’adresse de l’expéditeur, les fautes dans le message ou l’urgence exagérée (“Votre compte sera supprimé !”).",
+                "Ne jamais cliquer sur un lien douteux ni télécharger une pièce jointe inattendue. En cas de doute, il vaut mieux contacter directement l’entreprise via son vrai site web."
             ],
             side: "left"
         },
         {
-            title: "Lorem Ipsum",
-            content: "sodales. dui massa convallis, facilisis laoreet elit, at Praesent lorem. ex et vel nisl. Nunc faucibus nec efficitur. dolor est. venenatis nulla, eget libero.",
+            title: "Limiter les informations partagées en ligne",
+            content: "Ce que vous publiez en ligne peut être récupéré, partagé ou utilisé à votre insu.",
             paragraphs: [
-                "nulla, elit. Nunc Sed viverra Donec vitae est. quam eget ullamcorper adipiscing fringilla ultrices ex Lorem turpis massa consectetur Lorem hendrerit venenatis.",
-                "non ipsum amet., vitae dignissim, facilisis ultrices viverra faucibus eget"
+                "Chaque photo, commentaire ou information personnelle laissée en ligne laisse une trace numérique durable. Partager son lieu de résidence, des documents officiels, ses déplacements ou des informations sensibles augmente les risques d’usurpation d’identité ou de surveillance.",
+                "Il est préférable de réfléchir avant de publier : “Est-ce que j’ai vraiment besoin de partager ça ?” Ajuster la confidentialité des réseaux sociaux et éviter les publications publiques pour les contenus privés aide à garder le contrôle."
             ],
             side: "right"
         }
@@ -197,35 +197,35 @@ const FAQ = () => {
 
     const faqItems = [
         {
-            question: "sodales. dui massa convallis ?",
-            answer: "nulla, elit. Nunc Sed viverra Donec vitae est. quam eget ullamcorper adipiscing fringilla ultrices ex Lorem turpis massa consectetur Lorem hendrerit venenatis on ipsum amet, vitae dignissim, facilisis ultrices viverra faucibus eget"
+            question: "Qu’est-ce qu’une donnée personnelle ?",
+            answer: "Une donnée personnelle est toute information qui permet d’identifier une personne : nom, adresse, numéro de téléphone, localisation, habitudes en ligne, photos, identifiants de connexion, etc. Même une adresse IP peut être considérée comme une donnée personnelle"
         },
         {
-            question: "sodales. dui massa convallis ?",
-            answer: "nulla, elit. Nunc Sed viverra Donec vitae est. quam eget ullamcorper adipiscing fringilla ultrices ex Lorem turpis massa consectetur Lorem hendrerit venenatis on ipsum amet, vitae dignissim, facilisis ultrices viverra faucibus eget"
+            question: "Pourquoi les entreprises collectent-elles mes données ?",
+            answer: "Les données sont utilisées pour améliorer les services, personnaliser les contenus, proposer de la publicité ciblée ou analyser les comportements des utilisateurs. Certaines entreprises les revendent aussi à des partenaires commerciaux."
         },
         {
-            question: "sodales. dui massa convallis ?",
-            answer: "nulla, elit. Nunc Sed viverra Donec vitae est. quam eget ullamcorper adipiscing fringilla ultrices ex Lorem turpis massa consectetur Lorem hendrerit venenatis on ipsum amet, vitae dignissim, facilisis ultrices viverra faucibus eget"
+            question: "Est-ce que mes données sont protégées de la même façon dans tous les pays",
+            answer: "Non. Les lois varient énormément d’un pays à l’autre. Certains pays ont des règles très strictes, comme le RGPD en Europe, tandis que d’autres offrent une protection beaucoup plus faible. WorldPrivacy permet de visualiser rapidement ces différences"
         },
         {
-            question: "sodales. dui massa convallis ?",
-            answer: "nulla, elit. Nunc Sed viverra Donec vitae est. quam eget ullamcorper adipiscing fringilla ultrices ex Lorem turpis massa consectetur Lorem hendrerit venenatis on ipsum amet, vitae dignissim, facilisis ultrices viverra faucibus eget"
+            question: "Comment savoir si un site web est sécurisé",
+            answer: "Un site sécurisé utilise HTTPS (le cadenas dans la barre d’adresse) et possède une politique de confidentialité claire. Il ne demande que les informations nécessaires et ne redirige pas vers des pages inconnues ou suspectes"
         },
         {
-            question: "sodales. dui massa convallis ?",
-            answer: "nulla, elit. Nunc Sed viverra Donec vitae est. quam eget ullamcorper adipiscing fringilla ultrices ex Lorem turpis massa consectetur Lorem hendrerit venenatis on ipsum amet, vitae dignissim, facilisis ultrices viverra faucibus eget"
+            question: "Que faire si je pense que mes données ont été piratées",
+            answer: "Il faut changer immédiatement les mots de passe, activer la 2FA, vérifier les connexions récentes, contacter le service concerné et surveiller ses comptes bancaires. Dans certains cas, il est utile de signaler l’incident aux autorités compétentes"
         },
         {
-            question: "sodales. dui massa convallis ?",
-            answer: "nulla, elit. Nunc Sed viverra Donec vitae est. quam eget ullamcorper adipiscing fringilla ultrices ex Lorem turpis massa consectetur Lorem hendrerit venenatis on ipsum amet, vitae dignissim, facilisis ultrices viverra faucibus eget"
+            question: "Comment réduire ma trace numérique au quotidien",
+            answer: "Vous pouvez limiter les informations publiées, supprimer les comptes inutilisés, utiliser des outils comme un VPN, nettoyer régulièrement votre historique, vérifier les permissions des applications et désactiver le suivi publicitaire lorsque c’est possible"
         }
     ];
 
     return (
         <div className="min-h-screen bg-background pt-20">
             {/* Section Timeline */}
-            <section className="container mx-auto px-4 py-12 md:py-16">
+            <section className="container mx-auto px-4 py-12 md:py-25">
                 <div className="relative">
                     {/* Ligne centrale - cachée sur mobile */}
                     <div className="hidden md:block absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-gradient-to-b from-orange-500 via-purple-400 to-orange-500 opacity-30"/>
