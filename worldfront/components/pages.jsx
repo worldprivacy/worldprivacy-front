@@ -97,18 +97,11 @@ const HomePage = () => {
                     {/* Textes descriptifs */}
                     <div className="max-w-4xl mx-auto space-y-4 md:space-y-6 text-foreground leading-relaxed text-sm md:text-base">
                         <p>
-                            Nunc placerat non nibh at fringilla at, elit viverra facilisis consectetur nisl.
-                            tincidunt Lorem viverra sed diam elit efficitur. vitae porta Quisque placerat
+                        <strong>Bienvenue sur WorldPrivacy, votre guide pour la protection des données personnelles</strong>
                         </p>
-
                         <p>
-                            at, venenatis sed Cras elit dolor malesuada tincidunt odio quis Nunc Nunc commodo
-                            id In convallis. tincidunt efficitur. scelerisque gravida Donec Nullam ipsum
-                        </p>
-
-                        <p>
-                            cursus placerat Vestibulum lacus, vitae faucibus ex tempor placerat. risus amet,
-                            urna amet, ullamcorper sodales. placerat tempor ex. placerat fringilla orci
+                        À l’ère du numérique, nos informations personnelles circulent partout : réseaux sociaux, achats en ligne, applications mobiles… Protéger ses données n’a jamais été aussi crucial. Sur ce site, nous vous accompagnons pour comprendre vos droits, adopter les bonnes pratiques et naviguer en toute sécurité dans le monde numérique. Découvrez des conseils concrets, des outils fiables et des actualités pour rester maître de vos informations personnelles.
+                        Parce que vos données vous appartiennent, nous vous aidons à les protéger.  
                         </p>
                     </div>
                 </div>
@@ -231,7 +224,7 @@ const FAQ = () => {
                 "Chaque mise à jour inclut des correctifs qui protègent contre de nouvelles attaques. Reporter les mises à jour ouvre la porte à des vulnérabilités connues.",
                 "Il est conseillé d’activer les mises à jour automatiques sur les téléphones, les ordinateurs, les navigateurs et les applications. Garder ses appareils à jour permet de réduire considérablement le risque d’intrusion ou de vol de données."
             ],
-            side: "left"
+            side: "left" 
         },
         {
             title: "Vérifier les permissions de ses applications",
