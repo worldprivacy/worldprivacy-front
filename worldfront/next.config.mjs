@@ -1,14 +1,15 @@
 /** @type {import('next').NextConfig} */
+const apiUrl = process.env.URL_API;
 const nextConfig = {
     async rewrites() {
         return [
             {
                 source: '/api/questions',
-                destination: 'http://localhost:8080/question/list-random',
+                destination: apiUrl+'/question/list-random',
             },
             {
                 source: '/api/countries',
-                destination: 'http://localhost:8080/pays/list',
+                destination: apiUrl+'/pays/list',
             },
         ];
     },

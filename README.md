@@ -186,12 +186,18 @@ npm run build
 npm start
 ```
 
-### Variables d'environnement
+## Variables d'environnement
 
-Créer un fichier `.env.production` :
+L'application utilise une variable d'environnement pour définir l'URL de l'API.
+
+### Nom de la variable
+- `URL_API` : URL utilisée par l'API
+
+### En local
+Pour travailler avec l'API en local, créez un fichier `.env.local` à la racine du projet et ajoutez :
 
 ```env
-NEXT_PUBLIC_API_URL=https://votre-api.com
+URL_API=http://localhost:8080
 ```
 
 ## Problèmes connus
