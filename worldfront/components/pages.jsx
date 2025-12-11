@@ -120,6 +120,73 @@ const HomePage = () => {
     )
 }
 
+const MentionsLegales = () => {
+  const equipe = [
+    "Martin DELHAYE",
+    "Mame Cisse",
+    "Nathan MARIJNISSEN",
+    "Sanou FANE",
+    "Teremana HONORÉ"
+  ];
+
+  return (
+    <main className="min-h-screen bg-background pt-20 pb-20 px-6 md:px-16">
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-3xl md:text-5xl font-bold mb-4">Mentions légales</h1>
+
+        <p className="text-sm text-muted-foreground mb-6">
+          Ce site a été réalisé dans le cadre d’un <strong>projet scolaire universitaire</strong> par une équipe de <strong>5 étudiants</strong>, dans le cadre du cours de <strong>conception et programmation web</strong>, à <strong>L'UQAC</strong>.
+          Il n’a pas de vocation commerciale et sert uniquement à des fins pédagogiques.
+        </p>
+
+        <section className="mb-8">
+          <h2 className="text-xl font-semibold mb-3">Équipe du projet</h2>
+          <ul className="list-disc pl-6 space-y-1 text-sm">
+            {equipe.map((n, i) => (
+              <li key={i}>{n}</li>
+            ))}
+          </ul>
+        </section>
+
+        <section className="mb-8">
+          <h2 className="text-xl font-semibold mb-3">Conditions d'utilisation</h2>
+          <p className="text-sm mb-2">
+            Ce site est fourni à des fins pédagogiques. Les informations peuvent contenir des erreurs ou omissions.
+            L’utilisation du site se fait sous la responsabilité de l’utilisateur.
+          </p>
+        </section>
+
+        <section className="mb-8">
+          <h2 className="text-xl font-semibold mb-3">Données personnelles</h2>
+          <p className="text-sm mb-2">
+            Ce site <strong>ne collecte pas de données personnelles</strong>.
+            Aucune donnée n’est stockée ou partagée à des fins commerciales.
+          </p>
+        </section>
+
+        <section className="mb-8">
+          <h2 className="text-xl font-semibold mb-3">Propriété intellectuelle</h2>
+          <p className="text-sm">
+            Le code source et les éléments visuels sont la propriété de l’équipe du projet. Leur réutilisation nécessite l’accord de l’équipe.
+          </p>
+        </section>
+
+        <section className="mb-12">
+          <h2 className="text-xl font-semibold mb-3">Limitation de responsabilité</h2>
+          <p className="text-sm">
+            L’équipe étudiante ne peut être tenue responsable des erreurs, d’un mauvais usage du site ou de dysfonctionnements.
+          </p>
+        </section>
+
+        <footer className="text-sm text-muted-foreground">
+          <p className="mt-3">Dernière mise à jour : {new Date().toLocaleDateString()}</p>
+        </footer>
+      </div>
+    </main>
+  );
+};
+
+
 
 const Carte = () => {
     return (
@@ -291,6 +358,7 @@ const FAQ = () => {
             </section>
         </div>
     )
+    
 }
 
-export {HomePage, Carte, Quizz, FAQ}
+export {HomePage, Carte, Quizz, FAQ, MentionsLegales};
