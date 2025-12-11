@@ -26,19 +26,25 @@ export default function Footer() {
                                     Accueil
                                 </Link>
                             </li>
+                        </ul>
+                        <ul className="space-y-2 text-sm">
                             <li>
-                                <Link href="/about" className="text-muted-foreground hover:text-primary transition-colors">
-                                    À propos
+                                <Link href="/carte" className="text-muted-foreground hover:text-primary transition-colors">
+                                    Carte
                                 </Link>
                             </li>
+                        </ul>
+                        <ul className="space-y-2 text-sm">
                             <li>
-                                <Link href="/resources" className="text-muted-foreground hover:text-primary transition-colors">
-                                    Ressources
+                                <Link href="/quizz" className="text-muted-foreground hover:text-primary transition-colors">
+                                    Quizz
                                 </Link>
                             </li>
+                        </ul>
+                        <ul className="space-y-2 text-sm">
                             <li>
-                                <Link href="/blog" className="text-muted-foreground hover:text-primary transition-colors">
-                                    Blog
+                                <Link href="/faq" className="text-muted-foreground hover:text-primary transition-colors">
+                                    FAQ
                                 </Link>
                             </li>
                         </ul>
@@ -52,60 +58,15 @@ export default function Footer() {
                                     Mentions légales
                                 </Link>
                             </li>
-                            <li>
-                                <Link href="/legal/privacy" className="text-muted-foreground hover:text-primary transition-colors">
-                                    Politique de confidentialité
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="/legal/terms" className="text-muted-foreground hover:text-primary transition-colors">
-                                    Conditions d'utilisation
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="/legal/cookies" className="text-muted-foreground hover:text-primary transition-colors">
-                                    Gestion des cookies
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="/contact" className="text-muted-foreground hover:text-primary transition-colors">
-                                    Contact
-                                </Link>
-                            </li>
                         </ul>
                     </div>
 
                     <div>
-                        <h4 className="font-semibold mb-4">Rechercher</h4>
-                        <div className="relative mb-6">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                            <Input
-                                type="search"
-                                placeholder="Rechercher..."
-                                className="pl-10"
-                            />
-                        </div>
-
                         <h4 className="font-semibold mb-4">Nous suivre</h4>
                         <div className="flex gap-3">
                             <Button variant="outline" size="icon" asChild>
-                                <Link href="https://twitter.com" target="_blank" rel="noopener noreferrer">
-                                    <Twitter className="h-4 w-4" />
-                                </Link>
-                            </Button>
-                            <Button variant="outline" size="icon" asChild>
-                                <Link href="https://linkedin.com" target="_blank" rel="noopener noreferrer">
-                                    <Linkedin className="h-4 w-4" />
-                                </Link>
-                            </Button>
-                            <Button variant="outline" size="icon" asChild>
-                                <Link href="https://github.com" target="_blank" rel="noopener noreferrer">
+                                <Link href="https://github.com/worldprivacy" target="_blank" rel="noopener noreferrer">
                                     <Github className="h-4 w-4" />
-                                </Link>
-                            </Button>
-                            <Button variant="outline" size="icon" asChild>
-                                <Link href="mailto:contact@worldprivacy.com">
-                                    <Mail className="h-4 w-4" />
                                 </Link>
                             </Button>
                         </div>
